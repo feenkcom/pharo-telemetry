@@ -1,0 +1,79 @@
+Class {
+	#name : #MemoryTelemetry,
+	#superclass : #Object,
+	#traits : 'Telemetry',
+	#classTraits : 'Telemetry classTrait',
+	#instVars : [
+		'recordings',
+		'pingsStack'
+	],
+	#category : #'Telemetry-Telemetries'
+}
+
+{ #category : #'api - telemetry' }
+MemoryTelemetry >> emit [
+	recordings ifNotEmpty: [ :theTasks |
+		(TelemetrySignal new
+			task: recordings asTelemetryPing;
+			telemetry: self) emit ].
+	self reset
+]
+
+{ #category : #'private - lifecycle' }
+MemoryTelemetry >> finishSync [
+	| anEndTime |
+
+	anEndTime := Time microsecondClockValue.
+
+	pingsStack
+		ifEmpty: [ ^ self ].
+	
+	pingsStack pop
+		realEndTime: Time microsecondClockValue;
+		endTime: anEndTime;
+		gcEndTime: Smalltalk vm totalGCTime
+]
+
+{ #category : #initialization }
+MemoryTelemetry >> initialize [
+	super initialize.
+	
+	recordings := TelemetryRecordings new.
+	pingsStack := Stack new
+]
+
+{ #category : #'api - telemetry' }
+MemoryTelemetry >> reset [
+	[ pingsStack isNotEmpty ]
+		whileTrue: [ self finishSync ].
+
+	recordings removeAll.
+	pingsStack removeAll
+]
+
+{ #category : #'private - lifecycle' }
+MemoryTelemetry >> startSync: aNameBlock [
+	| aNewTask aRealStart aGcTime |
+	
+	aRealStart := Time microsecondClockValue.
+	aGcTime := Smalltalk vm totalGCTime.
+	
+	aNewTask := TelemetryPing new.
+	aNewTask name: aNameBlock value.
+	
+	pingsStack
+		ifEmpty: [ recordings add: aNewTask ]
+		ifNotEmpty: [ pingsStack top addPing: aNewTask ].
+
+	pingsStack push: aNewTask.
+	
+	aNewTask realStartTime: aRealStart.
+	aNewTask gcStartTime: aGcTime.
+	aNewTask startTime: Time microsecondClockValue.
+]
+
+{ #category : #'api - telemetry' }
+MemoryTelemetry >> time: aNameBlock during: aBlock [
+	self startSync: aNameBlock.
+	^ aBlock ensure: [ self finishSync ]
+]
