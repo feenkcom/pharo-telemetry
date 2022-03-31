@@ -31,7 +31,16 @@ TelemetryPing >> duration [
 	"The duration of the ping in microseconds"
 	<return: #Number>
 
-	^ self endTime - self startTime - self childrenOverhead
+	^ self endTime - self startTime - self childrenOverhead - self gcDurationInMicroseconds
+]
+
+{ #category : #printing }
+TelemetryPing >> durationInMicroseconds [
+	"Answer the receiver's duration.
+	If it hasn't been run, answer -1mS"
+
+	(endTime isNil or: [ startTime isNil ]) ifTrue: [ ^ -1 ].
+	^ self duration
 ]
 
 { #category : #printing }
@@ -54,8 +63,13 @@ TelemetryPing >> endTime: aNumberOfMicroseconds [
 ]
 
 { #category : #accessing }
-TelemetryPing >> gcDurationInMilliseconds [
+TelemetryPing >> gcDurationInMicroseconds [
 	^ (self gcEndTime - self gcStartTime)
+]
+
+{ #category : #accessing }
+TelemetryPing >> gcDurationInMilliseconds [
+	^ self gcDurationInMicroseconds / 1000.0
 ]
 
 { #category : #accessing }
@@ -64,18 +78,8 @@ TelemetryPing >> gcEndTime [
 ]
 
 { #category : #accessing }
-TelemetryPing >> gcEndTime: anObject [
-	gcEndTime := anObject
-]
-
-{ #category : #accessing }
 TelemetryPing >> gcStartTime [
 	^ gcStartTime
-]
-
-{ #category : #accessing }
-TelemetryPing >> gcStartTime: anObject [
-	gcStartTime := anObject
 ]
 
 { #category : #initialization }
@@ -136,6 +140,16 @@ TelemetryPing >> realStartTime: aNumberOfMicroseconds [
 ]
 
 { #category : #accessing }
+TelemetryPing >> recordOverheadEndTime [
+	gcEndTime := self totalGCTimeMicroseconds
+]
+
+{ #category : #accessing }
+TelemetryPing >> recordOverheadStartTime [
+	gcStartTime := self totalGCTimeMicroseconds
+]
+
+{ #category : #accessing }
 TelemetryPing >> startTime [
 	^ startTime
 ]
@@ -155,7 +169,28 @@ TelemetryPing >> tasks: aCollectionOfTasks [
 	recordings := aCollectionOfTasks as: TelemetryRecordings
 ]
 
+{ #category : #'private - primitives' }
+TelemetryPing >> totalFullGCTimeMicroseconds [
+	"Answer the total time in microseconds spent in full GCs since startup (read-only)."
+	<primitive: #'primitiveFullGarbageCollectorMicroseconds'>
+
+	^ Smalltalk vm totalFullGCTime * 1000
+]
+
+{ #category : #'private - primitives' }
+TelemetryPing >> totalGCTimeMicroseconds [
+	^ self totalFullGCTimeMicroseconds + self totalScavengeGCTimeMicroseconds
+]
+
 { #category : #accessing }
 TelemetryPing >> totalOverhead [
 	^ self overhead + self childrenOverhead
+]
+
+{ #category : #'private - primitives' }
+TelemetryPing >> totalScavengeGCTimeMicroseconds [
+	"Answer the total time in microseconds spent in scavenge GCs since startup (read-only)."
+	<primitive: #'primitiveScavengeGarbageCollectorMicroseconds'>
+
+	^ Smalltalk vm totalIncrementalGCTime * 1000
 ]

@@ -31,7 +31,7 @@ MemoryTelemetry >> finishSync [
 	pingsStack pop
 		realEndTime: Time microsecondClockValue;
 		endTime: anEndTime;
-		gcEndTime: Smalltalk vm totalGCTime
+		recordOverheadEndTime
 ]
 
 { #category : #initialization }
@@ -68,7 +68,7 @@ MemoryTelemetry >> startSync: aNameBlock [
 	pingsStack push: aNewTask.
 	
 	aNewTask realStartTime: aRealStart.
-	aNewTask gcStartTime: aGcTime.
+	aNewTask recordOverheadStartTime.
 	aNewTask startTime: Time microsecondClockValue.
 ]
 
