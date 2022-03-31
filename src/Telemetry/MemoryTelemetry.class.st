@@ -67,7 +67,7 @@ MemoryTelemetry >> startSync: aNameBlock [
 
 	pingsStack push: aNewTask.
 
-	aSender := thisContext.
+	aSender := thisContext sender sender sender.
 	[ aSender := aSender sender ] doWhileTrue: [
 		| aSelector |
 		aSelector := aSender selector.
