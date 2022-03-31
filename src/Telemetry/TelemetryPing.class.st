@@ -9,7 +9,8 @@ Class {
 		'gcStartTime',
 		'gcEndTime',
 		'name',
-		'recordings'
+		'recordings',
+		'sender'
 	],
 	#category : #'Telemetry-Utilities'
 }
@@ -147,6 +148,18 @@ TelemetryPing >> recordOverheadEndTime [
 { #category : #accessing }
 TelemetryPing >> recordOverheadStartTime [
 	gcStartTime := self totalGCTimeMicroseconds
+]
+
+{ #category : #accessing }
+TelemetryPing >> sender [
+
+	^ sender
+]
+
+{ #category : #accessing }
+TelemetryPing >> sender: anObject [
+
+	sender := anObject
 ]
 
 { #category : #accessing }
