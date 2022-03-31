@@ -80,6 +80,7 @@ MemoryTelemetry >> startSync: aNameBlock [
 
 { #category : #'api - telemetry' }
 MemoryTelemetry >> time: aNameBlock during: aBlock [
-	self startSync: aNameBlock.
-	^ aBlock ensure: [ self finishSync ]
+	^ [
+		self startSync: aNameBlock.
+		aBlock ensure: [ self finishSync ] ] valueUnpreemptively
 ]
