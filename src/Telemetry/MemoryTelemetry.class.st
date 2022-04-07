@@ -31,7 +31,7 @@ MemoryTelemetry >> finishSync [
 	pingsStack pop
 		realEndTime: Time microsecondClockValue;
 		endTime: anEndTime;
-		gcEndTime: Smalltalk vm totalGCTime
+		recordOverheadEndTime
 ]
 
 { #category : #initialization }
@@ -53,7 +53,7 @@ MemoryTelemetry >> reset [
 
 { #category : #'private - lifecycle' }
 MemoryTelemetry >> startSync: aNameBlock [
-	| aNewTask aRealStart aGcTime |
+	| aNewTask aRealStart aGcTime aSender |
 	
 	aRealStart := Time microsecondClockValue.
 	aGcTime := Smalltalk vm totalGCTime.
@@ -66,14 +66,21 @@ MemoryTelemetry >> startSync: aNameBlock [
 		ifNotEmpty: [ pingsStack top addPing: aNewTask ].
 
 	pingsStack push: aNewTask.
-	
+
+	aSender := thisContext sender sender sender.
+	[ aSender := aSender sender ] doWhileTrue: [
+		| aSelector |
+		aSelector := aSender selector.
+	 	aSelector = #time:during: or: [ aSelector = #timeSync:during: ] ].
+	aNewTask sender: aSender compiledCode.
 	aNewTask realStartTime: aRealStart.
-	aNewTask gcStartTime: aGcTime.
+	aNewTask recordOverheadStartTime.
 	aNewTask startTime: Time microsecondClockValue.
 ]
 
 { #category : #'api - telemetry' }
 MemoryTelemetry >> time: aNameBlock during: aBlock [
-	self startSync: aNameBlock.
-	^ aBlock ensure: [ self finishSync ]
+	^ [
+		self startSync: aNameBlock.
+		aBlock ensure: [ self finishSync ] ] valueUnpreemptively
 ]
