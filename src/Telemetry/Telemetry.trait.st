@@ -5,6 +5,11 @@ Trait {
 
 { #category : #'api - telemetry' }
 Telemetry >> emit [
+	self emitAs: self
+]
+
+{ #category : #'api - telemetry' }
+Telemetry >> emitAs: aSourceTelemetry [
 	
 ]
 

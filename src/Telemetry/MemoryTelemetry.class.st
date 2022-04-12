@@ -11,11 +11,11 @@ Class {
 }
 
 { #category : #'api - telemetry' }
-MemoryTelemetry >> emit [
+MemoryTelemetry >> emitAs: aSourceTelemetry [
 	recordings ifNotEmpty: [ :theTasks |
 		(TelemetrySignal new
 			task: recordings asTelemetryPing;
-			telemetry: self) emit ].
+			telemetry: aSourceTelemetry) emit ].
 	self reset
 ]
 
