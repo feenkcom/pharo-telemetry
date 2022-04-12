@@ -42,8 +42,8 @@ BaseProcessTelemetry >> default [
 ]
 
 { #category : #'api - telemetry' }
-BaseProcessTelemetry >> emit [
-	self value emit
+BaseProcessTelemetry >> emitAs: aSourceTelemetry [
+	self value emitAs: aSourceTelemetry
 ]
 
 { #category : #accessing }
