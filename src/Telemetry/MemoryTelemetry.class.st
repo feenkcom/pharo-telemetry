@@ -5,7 +5,8 @@ Class {
 	#classTraits : 'Telemetry classTrait',
 	#instVars : [
 		'recordings',
-		'pingsStack'
+		'pingsStack',
+		'tally'
 	],
 	#category : #'Telemetry-Telemetries'
 }
@@ -13,8 +14,14 @@ Class {
 { #category : #'api - telemetry' }
 MemoryTelemetry >> emitAs: aSourceTelemetry [
 	recordings ifNotEmpty: [ :theTasks |
+		| aPing |
+		aPing := recordings asTelemetryPing.
+		aPing := tally
+			ifNil: [ aPing ]
+			ifNotNil: [ :aTally | aPing copyWithTally: aTally ].
+
 		(TelemetrySignal new
-			task: recordings asTelemetryPing;
+			task: aPing;
 			telemetry: aSourceTelemetry) emit ].
 	self reset
 ]
@@ -48,7 +55,22 @@ MemoryTelemetry >> reset [
 		whileTrue: [ self finishSync ].
 
 	recordings removeAll.
-	pingsStack removeAll
+	pingsStack removeAll.
+	tally := nil
+]
+
+{ #category : #'api - telemetry' }
+MemoryTelemetry >> rootTime: aNameBlock during: aBlock [
+	tally := MessageTally new
+		reportOtherProcesses: false;
+		maxClassNameSize: 1000;
+		maxClassPlusSelectorSize: 1000;
+		maxTabs: 100;
+		yourself.
+
+	^ tally
+		spyEvery: 1
+		on: [ self time: aNameBlock during: aBlock ]
 ]
 
 { #category : #'private - lifecycle' }
@@ -79,8 +101,7 @@ MemoryTelemetry >> startSync: aNameBlock [
 ]
 
 { #category : #'api - telemetry' }
-MemoryTelemetry >> time: aNameBlock during: aBlock [
-	^ [
-		self startSync: aNameBlock.
-		aBlock ensure: [ self finishSync ] ] valueUnpreemptively
+MemoryTelemetry >> time: aNameBlock during: aBlock [	
+	self startSync: aNameBlock.
+	^ aBlock ensure: [ self finishSync ]
 ]
