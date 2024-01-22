@@ -13,6 +13,13 @@ TelemetrySignal >> duration [
 	^ self task duration
 ]
 
+{ #category : #accessing }
+TelemetrySignal >> ping [
+	<return: #TelemetryPing>
+
+	^ task
+]
+
 { #category : #printing }
 TelemetrySignal >> printOneLineContentsOn: stream [
 

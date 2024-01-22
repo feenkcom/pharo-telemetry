@@ -18,6 +18,11 @@ Telemetry >> reset [
 ]
 
 { #category : #'api - telemetry' }
+Telemetry >> rootTime: aNameBlock during: aBlock [
+	^ self time: aNameBlock during: aBlock
+]
+
+{ #category : #'api - telemetry' }
 Telemetry >> time: aNameBlock during: aBlock [
 	^ self explicitRequirement
 ]

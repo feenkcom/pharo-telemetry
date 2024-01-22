@@ -14,6 +14,12 @@ ManifestTelemetry class >> mustOnlyDependOn [
 		'Beacon-Core'.
 		'Collections-Sequenceable'.
 		'Collections-Stack'.
-		'Kernel'
+		'Kernel'.
+		'Tool-Profilers'.
 	}
+]
+
+{ #category : #testing }
+ManifestTelemetry class >> shouldValidateBaseline [
+	^ true
 ]

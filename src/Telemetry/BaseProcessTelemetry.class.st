@@ -27,6 +27,11 @@ BaseProcessTelemetry class >> reset [
 ]
 
 { #category : #tasks }
+BaseProcessTelemetry class >> rootTime: aNameBlock during: aBlock [
+	^ self soleInstance rootTime: aNameBlock during: aBlock
+]
+
+{ #category : #tasks }
 BaseProcessTelemetry class >> time: aNameBlock during: aBlock [
 	^ self soleInstance time: aNameBlock during: aBlock
 ]
@@ -60,6 +65,11 @@ BaseProcessTelemetry >> ensureValue [
 { #category : #'api - telemetry' }
 BaseProcessTelemetry >> reset [	
 	self value reset
+]
+
+{ #category : #'api - telemetry' }
+BaseProcessTelemetry >> rootTime: aNameBlock during: aBlock [
+	^ self value rootTime: aNameBlock during: aBlock
 ]
 
 { #category : #'api - telemetry' }

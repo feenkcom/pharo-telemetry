@@ -28,6 +28,14 @@ TelemetryPing >> childrenOverhead [
 ]
 
 { #category : #accessing }
+TelemetryPing >> copyWithTally: aTally [
+	^ TelemetryPingWithTally new
+		copySameFrom: self;
+		tally: aTally;
+		yourself
+]
+
+{ #category : #accessing }
 TelemetryPing >> duration [
 	"The duration of the ping in microseconds"
 	<return: #Number>
