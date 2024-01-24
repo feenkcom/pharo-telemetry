@@ -6,7 +6,7 @@ Class {
 	#instVars : [
 		'recordings',
 		'pingsStack',
-		'tally'
+		'data'
 	],
 	#category : #'Telemetry-Telemetries'
 }
@@ -16,12 +16,13 @@ MemoryTelemetry >> emitAs: aSourceTelemetry [
 	recordings ifNotEmpty: [ :theTasks |
 		| aPing |
 		aPing := recordings asTelemetryPing.
-		aPing := tally
-			ifNil: [ aPing ]
-			ifNotNil: [ :aTally | aPing copyWithTally: aTally ].
+		aPing := data at: #tally
+			ifPresent: [ :aTally | aPing copyWithTally: aTally ]
+			ifAbsent: [ aPing ].
 
 		(TelemetrySignal new
 			task: aPing;
+			data: data copy;
 			telemetry: aSourceTelemetry) emit ].
 	self reset
 ]
@@ -46,7 +47,18 @@ MemoryTelemetry >> initialize [
 	super initialize.
 	
 	recordings := TelemetryRecordings new.
-	pingsStack := Stack new
+	pingsStack := Stack new.
+	data := Dictionary new
+]
+
+{ #category : #accessing }
+MemoryTelemetry >> profile: aBlock executing: aCollectingBlock as: aSymbolKey [
+	"Record an extra telemetry data associating it with a given key"
+	| aValue aData |
+	
+	aData := aCollectingBlock value: [ aValue := aBlock value ].
+	data at: aSymbolKey put: aData.
+	^ aValue
 ]
 
 { #category : #'api - telemetry' }
@@ -56,21 +68,8 @@ MemoryTelemetry >> reset [
 
 	recordings removeAll.
 	pingsStack removeAll.
+	data removeAll.
 	tally := nil
-]
-
-{ #category : #'api - telemetry' }
-MemoryTelemetry >> rootTime: aNameBlock during: aBlock [
-	tally := MessageTally new
-		reportOtherProcesses: false;
-		maxClassNameSize: 1000;
-		maxClassPlusSelectorSize: 1000;
-		maxTabs: 100;
-		yourself.
-
-	^ tally
-		spyEvery: 1
-		on: [ self time: aNameBlock during: aBlock ]
 ]
 
 { #category : #'private - lifecycle' }
