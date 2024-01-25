@@ -22,13 +22,13 @@ BaseProcessTelemetry class >> isAbstract [
 ]
 
 { #category : #tasks }
-BaseProcessTelemetry class >> reset [
-	^ self soleInstance reset
+BaseProcessTelemetry class >> profile: aBlock executing: aCollectingBlock as: aSymbolKey [
+	^ self soleInstance profile: aBlock executing: aCollectingBlock as: aSymbolKey
 ]
 
 { #category : #tasks }
-BaseProcessTelemetry class >> rootTime: aNameBlock during: aBlock [
-	^ self soleInstance rootTime: aNameBlock during: aBlock
+BaseProcessTelemetry class >> reset [
+	^ self soleInstance reset
 ]
 
 { #category : #tasks }
@@ -63,13 +63,13 @@ BaseProcessTelemetry >> ensureValue [
 ]
 
 { #category : #'api - telemetry' }
-BaseProcessTelemetry >> reset [	
-	self value reset
+BaseProcessTelemetry >> profile: aBlock executing: aCollectingBlock as: aSymbolKey [
+	^ self value profile: aBlock executing: aCollectingBlock as: aSymbolKey
 ]
 
 { #category : #'api - telemetry' }
-BaseProcessTelemetry >> rootTime: aNameBlock during: aBlock [
-	^ self value rootTime: aNameBlock during: aBlock
+BaseProcessTelemetry >> reset [	
+	self value reset
 ]
 
 { #category : #'api - telemetry' }

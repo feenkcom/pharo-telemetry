@@ -35,6 +35,13 @@ NullTelemetry >> hash [
 	^ self class hash
 ]
 
+{ #category : #accessing }
+NullTelemetry >> profile: aBlock executing: aCollectingBlock as: aSymbolKey [
+	"Record an extra telemetry data associating it with a given key"
+	
+	^ aBlock value
+]
+
 { #category : #'api - telemetry' }
 NullTelemetry >> time: aNameBlock during: aBlock [
 	^ aBlock value

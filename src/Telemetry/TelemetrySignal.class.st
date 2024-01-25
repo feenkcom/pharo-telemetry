@@ -3,10 +3,21 @@ Class {
 	#superclass : #BeaconSignal,
 	#instVars : [
 		'task',
-		'telemetry'
+		'telemetry',
+		'data'
 	],
 	#category : #'Telemetry-Logger'
 }
+
+{ #category : #accessing }
+TelemetrySignal >> data [
+	^ data
+]
+
+{ #category : #accessing }
+TelemetrySignal >> data: anObject [
+	data := anObject
+]
 
 { #category : #accessing }
 TelemetrySignal >> duration [

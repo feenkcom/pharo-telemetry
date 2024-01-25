@@ -14,6 +14,7 @@ ManifestTelemetry class >> mustOnlyDependOn [
 		'Beacon-Core'.
 		'Collections-Sequenceable'.
 		'Collections-Stack'.
+		'Collections-Unordered'.
 		'Kernel'.
 		'Tool-Profilers'.
 	}
