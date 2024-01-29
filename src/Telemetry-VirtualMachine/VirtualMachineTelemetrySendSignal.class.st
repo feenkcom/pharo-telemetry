@@ -2,10 +2,8 @@ Class {
 	#name : #VirtualMachineTelemetrySendSignal,
 	#superclass : #VirtualMachineTelemetrySignal,
 	#instVars : [
-		'methodClass',
-		'selector',
-		'sender',
-		'framePointer'
+		'receiverClass',
+		'executedMethod'
 	],
 	#category : #'Telemetry-VirtualMachine'
 }
@@ -16,35 +14,24 @@ VirtualMachineTelemetrySendSignal >> accept: aVisitor [
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetrySendSignal >> framePointer [
-	^ framePointer
-]
-
-{ #category : #accessing }
 VirtualMachineTelemetrySendSignal >> gtMessageSourceCodeFor: aView [
 	<gtView>
 
 	^ aView forward
 		title: 'Message';
 		priority: 3;
-		object: [ methodClass lookupSelector: selector ];
+		object: [ executedMethod ];
 		view: #gtSourceCodeFor:
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetrySendSignal >> gtSenderSourceCodeFor: aView [
-	<gtView>
-
-	^ aView forward
-		title: 'Sender';
-		priority: 2;
-		object: [ sender ];
-		view: #gtSourceCodeFor:
+VirtualMachineTelemetrySendSignal >> method [
+	^ executedMethod
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetrySendSignal >> methodClass [
-	^ methodClass
+	^ executedMethod methodClass
 ]
 
 { #category : #accessing }
@@ -53,23 +40,30 @@ VirtualMachineTelemetrySendSignal >> printOn: aStream [
 	
 	aStream
 		nextPutAll: 'Send';
-		space;
-		print: self methodClass;
-		nextPutAll: '>>'; print: self selector;
-		space;
-		nextPutAll: 'from';
-		space;
-		print: self sender;
-		space;
-		print: self framePointer.
+		space.
+	
+	(self receiverClass isNil or: [ self receiverClass = self methodClass])
+		ifTrue: [ aStream print: self method ]
+		ifFalse: [
+			aStream
+				print: self receiverClass;
+				space;
+				nextPut: $(;
+				print: self methodClass;
+				nextPut: $);
+				space;
+				nextPutAll: '>>';
+				space;
+				print: self selector ]
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetrySendSignal >> receiverClass [
+	"May be nil"
+	^ receiverClass
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetrySendSignal >> selector [
-	^ selector
-]
-
-{ #category : #accessing }
-VirtualMachineTelemetrySendSignal >> sender [
-	^ sender
+	^ executedMethod selector
 ]

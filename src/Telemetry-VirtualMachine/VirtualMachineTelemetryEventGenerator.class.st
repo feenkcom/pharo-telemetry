@@ -46,7 +46,7 @@ VirtualMachineTelemetryEventGenerator >> isEvent: anEvent targetForReturnTo: aSi
 	shouldCompareByFramePointer
 		ifTrue: [ ^ anEvent framePointer = aSignal framePointer ].
 
-	^ anEvent sender = aSignal method
+	^ true
 ]
 
 { #category : #accessing }
@@ -85,12 +85,19 @@ VirtualMachineTelemetryEventGenerator >> visitMethodSwitch: aSignal [
 
 { #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> visitReturn: aSignal [
+	| hasTargetFramePointer currentEvent |
 	signalStack ifEmpty: [ ^ self ].
 	eventStack ifEmpty: [ ^ self ].
 
-	aSignal isTo
-		ifTrue: [ self visitReturnToFrame: aSignal ]
-		ifFalse: [ self visitReturnFromFrame: aSignal ]
+	hasTargetFramePointer := eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ].
+
+	[
+		currentEvent := eventStack pop.
+		currentEvent endSignal: aSignal.
+		signalStack pop ]
+	doWhileFalse: [
+		(self isEvent: currentEvent targetForReturnTo: aSignal comparingByFramePointer: hasTargetFramePointer)
+			or: [ eventStack isEmpty or: [ signalStack isEmpty ] ] ]
 ]
 
 { #category : #accessing }

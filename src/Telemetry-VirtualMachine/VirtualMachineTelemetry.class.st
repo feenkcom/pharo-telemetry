@@ -9,6 +9,13 @@ Class {
 }
 
 { #category : #'private - primitives' }
+VirtualMachineTelemetry class >> primDisableTelemetry [
+	<primitive: #primitiveDisableTelemetry>
+	
+	^ self primitiveFailed
+]
+
+{ #category : #'private - primitives' }
 VirtualMachineTelemetry class >> primStartTelemetry [
 	<primitive: #primitiveStartTelemetry>
 	
@@ -40,7 +47,9 @@ VirtualMachineTelemetry class >> start [
 { #category : #accessing }
 VirtualMachineTelemetry class >> stop [
 	<return: #VirtualMachineTelemetry>
-
+	
+	self primDisableTelemetry.
+	
 	^ self new
 		setHandle: self primStopTelemetry;
 		yourself
