@@ -2,16 +2,10 @@ Class {
 	#name : #VirtualMachineTelemetryMethodSwitchSignal,
 	#superclass : #VirtualMachineTelemetrySignal,
 	#instVars : [
-		'method',
-		'framePointer'
+		'method'
 	],
 	#category : #'Telemetry-VirtualMachine'
 }
-
-{ #category : #accessing }
-VirtualMachineTelemetryMethodSwitchSignal >> framePointer [
-	^ framePointer
-]
 
 { #category : #accessing }
 VirtualMachineTelemetryMethodSwitchSignal >> gtSourceCodeFor: aView [
@@ -38,7 +32,5 @@ VirtualMachineTelemetryMethodSwitchSignal >> printOn: aStream [
 		space;
 		nextPutAll: 'to';
 		space;
-		print: self method;
-		space;
-		print: self framePointer.
+		print: self method
 ]

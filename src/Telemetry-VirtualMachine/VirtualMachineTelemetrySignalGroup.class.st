@@ -47,11 +47,22 @@ VirtualMachineTelemetrySignalGroup >> first: n [
 VirtualMachineTelemetrySignalGroup >> gtItemsFor: aView [
 	<gtView>
 	
-	^ aView forward
+	^ aView columnedList
 		title: 'Items';
 		priority: 2;
-		object: [ self asArray ];
-		view: #gtItemsFor:
+		items: [ self asArray ];
+		column: 'Index' text: [ :each :i | i ] width: 50;
+		column: 'Signal' text: [ :each | each ];
+		column: 'Execution'
+			text: [ :each | each isReturnSignal ifTrue: [ each executionLocationName ] ifFalse: [ '' ] ]
+			width: 150;
+		column: 'Source'
+			text: [ :each | each isReturnSignal ifTrue: [ each sourceIdName asRopedText glamorousRegularSmallSize ] ifFalse: [ '' ] ]
+			width: 200;
+		column: 'Frame pointer'
+			text: [ :each | (each framePointer ifNil: [ '' ] ifNotNil: [ :anAddress | anAddress printString ]) ]
+			width: 120;
+		actionUpdateButton
 ]
 
 { #category : #accessing }
@@ -63,6 +74,15 @@ VirtualMachineTelemetrySignalGroup >> printOn: aStream [
 		nextPut: $(;
 		print: self size;
 		nextPut: $)
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetrySignalGroup >> select: aBlock [
+	| aCollection |
+	aCollection := OrderedCollection streamContents: [ :aStream |
+		self do: [ :each | (aBlock value: each)
+			ifTrue: [ aStream nextPut: each ] ] ].
+	^ self class new collection: aCollection
 ]
 
 { #category : #accessing }

@@ -3,8 +3,8 @@ Class {
 	#superclass : #VirtualMachineTelemetrySignal,
 	#instVars : [
 		'method',
-		'isFrom',
-		'framePointer'
+		'sourceId',
+		'executionLocation'
 	],
 	#category : #'Telemetry-VirtualMachine'
 }
@@ -14,9 +14,18 @@ VirtualMachineTelemetryReturnSignal >> accept: aVisitor [
 	aVisitor visitReturn: self
 ]
 
-{ #category : #accessing }
-VirtualMachineTelemetryReturnSignal >> framePointer [
-	^ framePointer
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> executionLocationName [
+	self isInterpreterCode
+		ifTrue: [ ^ 'Interpreter' ].
+	self isMachineCode
+		ifTrue: [ ^ 'Machine' ].
+	self isInterpreterToMachineCode
+		ifTrue: [ ^ 'Interpreter -> Machine' ].
+	self isMachineToInterpreterCode
+		ifTrue: [ ^ 'Machine -> Interpreter' ].
+
+	^ ''
 ]
 
 { #category : #accessing }
@@ -32,7 +41,32 @@ VirtualMachineTelemetryReturnSignal >> gtSourceCodeFor: aView [
 
 { #category : #accessing }
 VirtualMachineTelemetryReturnSignal >> isFrom [
-	^ isFrom
+	^ false
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isInterpreterCode [
+	^ executionLocation = 1
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isInterpreterToMachineCode [
+	^ executionLocation = 3
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isMachineCode [
+	^ executionLocation = 2
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isMachineToInterpreterCode [
+	^ executionLocation = 4
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isReturnSignal [
+	^ true
 ]
 
 { #category : #accessing }
@@ -57,14 +91,48 @@ VirtualMachineTelemetryReturnSignal >> printOn: aStream [
 	aStream
 		nextPutAll: 'Return';
 		space;
-		nextPutAll: (self isFrom ifTrue: [ 'from' ] ifFalse: [ 'to' ]);
+		nextPutAll: 'to';
 		space;
-		print: self method;
-		space;
-		print: self framePointer.
+		print: self method
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetryReturnSignal >> selector [
 	^ method selector
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> sourceId [
+	^ sourceId
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> sourceIdName [
+	"
+	ReturnToInterpreterSignal := 1.
+	ReturnToExecutiveSignal := 2.
+	ReturnToExecutivePostContextSwitchSignal := 3.
+	ReturnToMachineCodeFrameSignal := 4.
+	MaybeReturnToMachineCodeFrameSignal := 5.
+	BaseFrameReturnSignal := 6
+	"
+	sourceId = 1
+		ifTrue: [ ^ 'ReturnToInterpreterSignal' ].
+		
+	sourceId = 2
+		ifTrue: [ ^ 'ReturnToExecutiveSignal' ].
+		
+	sourceId = 3
+		ifTrue: [ ^ 'ReturnToExecutivePostContextSwitchSignal' ].
+		
+	sourceId = 4
+		ifTrue: [ ^ 'ReturnToMachineCodeFrameSignal' ].
+		
+	sourceId = 5
+		ifTrue: [ ^ 'MaybeReturnToMachineCodeFrameSignal' ].
+		
+	sourceId = 6
+		ifTrue: [ ^ 'BaseFrameReturnSignal' ].
+
+	^ ''
 ]
