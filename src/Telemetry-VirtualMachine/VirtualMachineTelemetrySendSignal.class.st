@@ -35,13 +35,7 @@ VirtualMachineTelemetrySendSignal >> methodClass [
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetrySendSignal >> printOn: aStream [ 
-	"Overrides method inherited from the byte arrayed collection."
-	
-	aStream
-		nextPutAll: 'Send';
-		space.
-	
+VirtualMachineTelemetrySendSignal >> printMethodOn: aStream [
 	(self receiverClass isNil or: [ self receiverClass = self methodClass])
 		ifTrue: [ aStream print: self method ]
 		ifFalse: [
@@ -55,6 +49,17 @@ VirtualMachineTelemetrySendSignal >> printOn: aStream [
 				nextPutAll: '>>';
 				space;
 				print: self selector ]
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetrySendSignal >> printOn: aStream [ 
+	"Overrides method inherited from the byte arrayed collection."
+
+	aStream
+		nextPutAll: 'Send';
+		space.
+
+	self printMethodOn: aStream
 ]
 
 { #category : #accessing }
