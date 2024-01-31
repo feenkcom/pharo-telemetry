@@ -5,7 +5,7 @@ Class {
 		'events',
 		'startSignal',
 		'endSignal',
-		'otherSignals'
+		'duration'
 	],
 	#category : #'Telemetry-VirtualMachine'
 }
@@ -19,8 +19,18 @@ VirtualMachineTelemetryEvent >> addEvent: anEvent [
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetryEvent >> addSignal: aSignal [
-	otherSignals add: aSignal
+VirtualMachineTelemetryEvent >> durationMicroseconds [
+	^ duration / 1000.0
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetryEvent >> durationMilliseconds [
+	^ duration / 1000000.0
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetryEvent >> durationNanos [
+	^ duration
 ]
 
 { #category : #accessing }
@@ -33,7 +43,8 @@ VirtualMachineTelemetryEvent >> endSignal: aSignal [
 	self
 		assert: [ endSignal isNil ]
 		description: [ 'End can''t be re-assigned' ].
-	endSignal := aSignal
+	endSignal := aSignal.
+	duration := endSignal timestamp - startSignal timestamp
 ]
 
 { #category : #accessing }
@@ -68,10 +79,10 @@ VirtualMachineTelemetryEvent >> gtSenderSourceCodeFor: aView [
 	<gtView>
 
 	^ aView forward
-		title: 'Sender';
+		title: 'Message';
 		priority: 3;
 		object: [ startSignal ];
-		view: #gtSenderSourceCodeFor:
+		view: #gtMessageSourceCodeFor:
 ]
 
 { #category : #accessing }
@@ -84,7 +95,12 @@ VirtualMachineTelemetryEvent >> initialize [
 	super initialize.
 	
 	events := OrderedCollection new.
-	otherSignals := OrderedCollection new
+	duration := 0
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetryEvent >> method [
+	^ startSignal method
 ]
 
 { #category : #accessing }
@@ -94,7 +110,15 @@ VirtualMachineTelemetryEvent >> methodClass [
 
 { #category : #accessing }
 VirtualMachineTelemetryEvent >> printOn: aStream [
-	aStream print: startSignal
+	startSignal ifNil: [ ^ super printOn: aStream ].
+	startSignal printMethodOn: aStream.
+	aStream
+		space;
+		nextPut: $(;
+		print: self durationMicroseconds;
+		space;
+		nextPutAll: 'μs';
+		nextPut: $)
 ]
 
 { #category : #accessing }

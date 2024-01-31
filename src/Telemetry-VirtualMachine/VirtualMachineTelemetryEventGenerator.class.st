@@ -11,8 +11,8 @@ Class {
 
 { #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> generateFrom: theSignals [
-	theSignals withIndexDo: [ :each :i | i = 31 ifTrue: [ "self halt" ]. each accept: self ].
-	rootEvents size = 1
+	theSignals withIndexDo: [ :each :i | i = 53 ifTrue: [ "self halt" ]. each accept: self ].
+	rootEvents size >= 1
 		ifTrue: [ ^ rootEvents first ].
 	^ rootEvents
 ]
@@ -24,21 +24,6 @@ VirtualMachineTelemetryEventGenerator >> initialize [
 	eventStack := Stack new.
 	signalStack := Stack new.
 	rootEvents := OrderedCollection new
-]
-
-{ #category : #accessing }
-VirtualMachineTelemetryEventGenerator >> isEvent: anEvent targetForReturnFrom: aSignal comparingByFramePointer: shouldCompareByFramePointer [
-	shouldCompareByFramePointer
-		ifTrue: [ ^ anEvent framePointer = aSignal framePointer ].
-	
-	"different selector => not our candidate"
-	anEvent selector ~= aSignal selector
-		ifTrue: [ ^ false ].
-
-	anEvent methodClass = aSignal methodClass
-		ifTrue: [ ^ true ].
-	
-	^ true "anEvent methodClass lookupSelector: aSignal selector"
 ]
 
 { #category : #accessing }
@@ -70,13 +55,8 @@ VirtualMachineTelemetryEventGenerator >> pushNewEventFor: aSignal [
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetryEventGenerator >> pushSiblingEventFor: aSignal [
-	eventStack ifNotEmpty: [ eventStack pop ].
-	self pushNewEventFor: aSignal.
-]
-
-{ #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> visitContextSwitch: aSignal [
+	self halt.
 ]
 
 { #category : #accessing }
@@ -85,93 +65,37 @@ VirtualMachineTelemetryEventGenerator >> visitMethodSwitch: aSignal [
 
 { #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> visitReturn: aSignal [
-	| hasTargetFramePointer currentEvent |
-	signalStack ifEmpty: [ ^ self ].
+	| currentEvent |
 	eventStack ifEmpty: [ ^ self ].
 
-	hasTargetFramePointer := eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ].
-
-	[
-		currentEvent := eventStack pop.
-		currentEvent endSignal: aSignal.
-		signalStack pop ]
-	doWhileFalse: [
-		(self isEvent: currentEvent targetForReturnTo: aSignal comparingByFramePointer: hasTargetFramePointer)
-			or: [ eventStack isEmpty or: [ signalStack isEmpty ] ] ]
-]
-
-{ #category : #accessing }
-VirtualMachineTelemetryEventGenerator >> visitReturnFromFrame: aSignal [
-	| hasTargetFramePointer currentEvent |
+	(eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ])
+		ifTrue: [ ^ self visitReturnBackToFrame: aSignal ].
 	
-	hasTargetFramePointer := eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ].
-	hasTargetFramePointer ifTrue: [ ^ self visitReturnFromSpecificFrame: aSignal ].
-
-	[
-		currentEvent := eventStack pop.
-		currentEvent endSignal: aSignal.
-		signalStack pop ]
-	doWhileFalse: [
-		(self isEvent: currentEvent targetForReturnFrom: aSignal comparingByFramePointer: hasTargetFramePointer)
-			or: [ eventStack isEmpty or: [ signalStack isEmpty ] ] ]
+	true ifTrue: [ ^ eventStack pop endSignal: aSignal ].
+	
+	[ currentEvent := eventStack pop.
+	  currentEvent endSignal: aSignal ]
+		doWhileTrue: [
+			(currentEvent framePointer ~= aSignal framePointer)
+				and: [ eventStack notEmpty ] ]
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetryEventGenerator >> visitReturnFromSpecificFrame: aSignal [
-	"The return signal's frame pointer corresponds to one of the frames on the events stack"
+VirtualMachineTelemetryEventGenerator >> visitReturnBackToFrame: aSignal [
 	| currentEvent |
-
-	"keep popping until the popped event matches the frame pointer.
-	then we should pop one more time to get back"
-	[
-		currentEvent := eventStack pop.
-		currentEvent endSignal: aSignal.
-		signalStack pop ]
-	doWhileFalse: [
-		(currentEvent framePointer = aSignal framePointer)
-			or: [ eventStack isEmpty or: [ signalStack isEmpty ] ] ].
-			
-	eventStack ifNotEmpty: [
-		currentEvent := eventStack pop.
-		currentEvent endSignal: aSignal ].
-		
-	signalStack ifNotEmpty: [ signalStack pop ]
-]
-
-{ #category : #accessing }
-VirtualMachineTelemetryEventGenerator >> visitReturnToFrame: aSignal [
-	| hasTargetFramePointer currentEvent |
 	
-	hasTargetFramePointer := eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ].
-
-	[
-		currentEvent := eventStack pop.
-		currentEvent endSignal: aSignal.
-		signalStack pop ]
-	doWhileFalse: [
-		(self isEvent: currentEvent targetForReturnTo: aSignal comparingByFramePointer: hasTargetFramePointer)
-			or: [ eventStack isEmpty or: [ signalStack isEmpty ] ] ]
+	[ currentEvent := eventStack pop.
+	  currentEvent endSignal: aSignal ]
+		doWhileTrue: [
+			(currentEvent framePointer ~= aSignal framePointer)
+				and: [ eventStack notEmpty ] ]
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> visitSend: aSignal [
-	signalStack
-		ifEmpty: [
-			self pushNewEventFor: aSignal.
-			signalStack push: aSignal.
-			^ self ].
+	eventStack ifNotEmpty: [ :aStack |
+		aStack top framePointer = aSignal framePointer
+			ifTrue: [ eventStack pop endSignal: aSignal ] ].
 
-	"message sends on the same frame"
-	signalStack top framePointer = aSignal framePointer
-		ifTrue: [
-			self pushSiblingEventFor: aSignal.
-		
-			eventStack top addSignal: aSignal.
-			signalStack pop.
-			signalStack push: aSignal.
-			^ self ].
-
-	"message send on a different frame"
-	self pushNewEventFor: aSignal.
-	signalStack push: aSignal.
+	self pushNewEventFor: aSignal
 ]

@@ -133,6 +133,9 @@ VirtualMachineTelemetryReturnSignal >> sourceIdName [
 		
 	sourceId = 6
 		ifTrue: [ ^ 'BaseFrameReturnSignal' ].
+		
+	sourceId = 7
+		ifTrue: [ ^ 'ExternalAboutToReturnThroughSignal' ].
 
-	^ ''
+	^ 'unknown'
 ]
