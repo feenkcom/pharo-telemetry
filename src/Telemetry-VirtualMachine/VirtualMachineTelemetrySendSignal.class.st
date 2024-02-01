@@ -20,18 +20,19 @@ VirtualMachineTelemetrySendSignal >> gtMessageSourceCodeFor: aView [
 	^ aView forward
 		title: 'Message';
 		priority: 3;
-		object: [ executedMethod ];
+		object: [ self method ];
 		view: #gtSourceCodeFor:
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetrySendSignal >> method [
-	^ executedMethod
+	^ self receiverClass
+		ifNotNil: [ :aClass | aClass lookupSelector: self selector ]
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetrySendSignal >> methodClass [
-	^ executedMethod methodClass
+	^ self method methodClass
 ]
 
 { #category : #accessing }
@@ -66,9 +67,13 @@ VirtualMachineTelemetrySendSignal >> printOn: aStream [
 VirtualMachineTelemetrySendSignal >> receiverClass [
 	"May be nil"
 	^ receiverClass
+		ifNotNil: [ :anObject |
+			anObject isClass
+				ifTrue: [ anObject ]
+				ifFalse: [ anObject class ] ]
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetrySendSignal >> selector [
-	^ executedMethod selector
+	^ executedMethod asSymbol
 ]

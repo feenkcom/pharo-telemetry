@@ -111,10 +111,13 @@ VirtualMachineTelemetryReturnSignal >> sourceIdName [
 	"
 	ReturnToInterpreterSignal := 1.
 	ReturnToExecutiveSignal := 2.
-	ReturnToExecutivePostContextSwitchSignal := 3.
-	ReturnToMachineCodeFrameSignal := 4.
-	MaybeReturnToMachineCodeFrameSignal := 5.
-	BaseFrameReturnSignal := 6
+	ReturnToMachineCodeFrameSignal := 3.
+	MaybeReturnToMachineCodeFrameSignal := 4.
+	ExternalAboutToReturnThroughSignal := 5.
+	BaseFrameReturnSignal := 6.
+	ReturnToExecutivePostContextWithSwitchSignal := 7.
+	ReturnToExecutivePostContextWithoutSwitchSignal := 8.
+	NonLocalReturnSignal := 9.
 	"
 	sourceId = 1
 		ifTrue: [ ^ 'ReturnToInterpreterSignal' ].
@@ -123,19 +126,25 @@ VirtualMachineTelemetryReturnSignal >> sourceIdName [
 		ifTrue: [ ^ 'ReturnToExecutiveSignal' ].
 		
 	sourceId = 3
-		ifTrue: [ ^ 'ReturnToExecutivePostContextSwitchSignal' ].
-		
-	sourceId = 4
 		ifTrue: [ ^ 'ReturnToMachineCodeFrameSignal' ].
 		
-	sourceId = 5
+	sourceId = 4
 		ifTrue: [ ^ 'MaybeReturnToMachineCodeFrameSignal' ].
+		
+	sourceId = 5
+		ifTrue: [ ^ 'ExternalAboutToReturnThroughSignal' ].
 		
 	sourceId = 6
 		ifTrue: [ ^ 'BaseFrameReturnSignal' ].
 		
 	sourceId = 7
-		ifTrue: [ ^ 'ExternalAboutToReturnThroughSignal' ].
+		ifTrue: [ ^ 'ReturnToExecutivePostContextWithSwitchSignal' ].
+		
+	sourceId = 8
+		ifTrue: [ ^ 'ReturnToExecutivePostContextWithoutSwitchSignal' ].
+	
+	sourceId = 9
+		ifTrue: [ ^ 'NonLocalReturnSignal' ].
 
-	^ 'unknown'
+	^ 'Unknown: ',sourceId asString
 ]

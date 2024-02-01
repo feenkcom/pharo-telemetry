@@ -66,6 +66,9 @@ VirtualMachineTelemetryEventGenerator >> visitMethodSwitch: aSignal [
 { #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> visitReturn: aSignal [
 	| currentEvent |
+	
+	true ifTrue: [ ^ self ].
+	
 	eventStack ifEmpty: [ ^ self ].
 
 	(eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ])
@@ -94,8 +97,8 @@ VirtualMachineTelemetryEventGenerator >> visitReturnBackToFrame: aSignal [
 { #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> visitSend: aSignal [
 	eventStack ifNotEmpty: [ :aStack |
-		aStack top framePointer = aSignal framePointer
-			ifTrue: [ eventStack pop endSignal: aSignal ] ].
-
+		(eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ])
+			ifTrue: [ self visitReturnBackToFrame: aSignal ] ].
+			
 	self pushNewEventFor: aSignal
 ]
