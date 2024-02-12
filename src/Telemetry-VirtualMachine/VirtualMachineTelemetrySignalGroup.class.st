@@ -57,7 +57,7 @@ VirtualMachineTelemetrySignalGroup >> gtItemsFor: aView [
 			text: [ :each | each isReturnSignal ifTrue: [ each executionLocationName ] ifFalse: [ '' ] ]
 			width: 150;
 		column: 'Source'
-			text: [ :each | each isReturnSignal ifTrue: [ each sourceIdName asRopedText glamorousRegularSmallSize ] ifFalse: [ '' ] ]
+			text: [ :each | each sourceIdName asRopedText glamorousRegularSmallSize ]
 			width: 200;
 		column: 'Frame pointer'
 			text: [ :each | (each framePointer ifNil: [ '' ] ifNotNil: [ :anAddress | anAddress printString ]) ]

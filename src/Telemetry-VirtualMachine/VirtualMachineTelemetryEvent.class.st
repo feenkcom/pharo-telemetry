@@ -60,16 +60,44 @@ VirtualMachineTelemetryEvent >> framePointer [
 { #category : #accessing }
 VirtualMachineTelemetryEvent >> gtEventsTreeFor: aView [
 	<gtView>
-	
-	^ aView tree
+	| aScale |
+	self hasEnd
+		ifTrue: [ aScale := NSScale linear.
+			aScale
+				range: {Color gray.
+						Color
+							r: 216
+							g: 55
+							b: 62
+							range: 255}.
+			aScale
+				domain: {0.
+						self durationMicroseconds} ].
+
+	^ aView columnedTree
 		title: 'Events';
 		priority: 2;
-		items: [ { self } ];
+		items: [ {self} ];
 		children: #events;
-		itemText: [ :each |
-			each hasEnd
-				ifTrue: [ each printString asRopedText ]
-				ifFalse: [ each printString asRopedText foreground: BrGlamorousColors failureBorderColor ] ];
+		column: 'Method'
+			text: [ :each | 
+				each hasEnd
+					ifTrue: [
+						| eachColor |
+						eachColor := self hasEnd
+							ifTrue: [ aScale scale: each durationMicroseconds ]
+							ifFalse: [ Color black ].
+						each printString asRopedText foreground: eachColor ]
+					ifFalse: [ each printString asRopedText
+							foreground: BrGlamorousColors failureBorderColor ] ];
+		column: 'Percent'
+			text: [ :each | 
+				self hasEnd
+					ifTrue: [ ((each durationMicroseconds / self durationMicroseconds asFloat * 100
+							printShowingDecimalPlaces: 1) , '%') asRopedText glamorousRegularFont
+							foreground: (aScale scale: each durationMicroseconds) ]
+					ifFalse: [ '-' ] ]
+			width: 100;
 		expandUpTo: 10;
 		actionUpdateButton
 ]
@@ -87,7 +115,7 @@ VirtualMachineTelemetryEvent >> gtSenderSourceCodeFor: aView [
 
 { #category : #accessing }
 VirtualMachineTelemetryEvent >> hasEnd [
-	^ endSignal isNotNil
+	^ endSignal notNil
 ]
 
 { #category : #accessing }

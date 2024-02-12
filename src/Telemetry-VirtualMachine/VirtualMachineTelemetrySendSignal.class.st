@@ -1,9 +1,10 @@
 Class {
 	#name : #VirtualMachineTelemetrySendSignal,
-	#superclass : #VirtualMachineTelemetrySignal,
+	#superclass : #VirtualMachineTelemetryFrameSignal,
 	#instVars : [
 		'receiverClass',
-		'executedMethod'
+		'executedMethod',
+		'sourceId'
 	],
 	#category : #'Telemetry-VirtualMachine'
 }
@@ -76,4 +77,53 @@ VirtualMachineTelemetrySendSignal >> receiverClass [
 { #category : #accessing }
 VirtualMachineTelemetrySendSignal >> selector [
 	^ executedMethod asSymbol
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetrySendSignal >> sourceId [
+	^ sourceId
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetrySendSignal >> sourceIdName [
+	sourceId = 1
+		ifTrue: [ ^ 'EmitLinkedSend' ].
+		
+	sourceId = 2
+		ifTrue: [ ^ 'ceSendFromInLineCacheMiss' ].
+		
+	sourceId = 3
+		ifTrue: [ ^ 'ceInterpretMethodFromPIC' ].
+		
+	sourceId = 4
+		ifTrue: [ ^ 'sendBreakpoint' ].
+
+	sourceId = 5
+		ifTrue: [ ^ 'commonSendOrdinary' ].
+
+	sourceId = 6
+		ifTrue: [ ^ 'ceSend:above:to:numArgs:' ].
+	
+	sourceId = 7
+		ifTrue: [ ^ 'ceSend:super:to:numArgs:' ].
+
+	sourceId = 8
+		ifTrue: [ ^ 'interpretMethodFromMachineCode' ].
+		
+	sourceId = 9
+		ifTrue: [ ^ 'executeNewMethod' ].
+		
+	sourceId = 10
+		ifTrue: [ ^ 'activateNewMethod' ].
+		
+	sourceId = 11
+		ifTrue: [ ^ 'activateCoggedNewMethod:' ].
+		
+	sourceId = 12
+		ifTrue: [ ^ 'returnToExecutive:postContextSwitch: (Interpr)' ].
+		
+	sourceId = 13
+		ifTrue: [ ^ 'returnToExecutive:postContextSwitch: (Machine)' ].
+
+	^ 'Unknown: ',sourceId asString
 ]
