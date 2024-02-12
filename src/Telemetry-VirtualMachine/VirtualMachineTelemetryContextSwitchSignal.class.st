@@ -1,6 +1,6 @@
 Class {
 	#name : #VirtualMachineTelemetryContextSwitchSignal,
-	#superclass : #VirtualMachineTelemetrySignal,
+	#superclass : #VirtualMachineTelemetryFrameSignal,
 	#category : #'Telemetry-VirtualMachine'
 }
 

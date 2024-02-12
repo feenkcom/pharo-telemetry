@@ -1,10 +1,6 @@
 Class {
 	#name : #VirtualMachineTelemetrySignal,
 	#superclass : #Object,
-	#instVars : [
-		'timestamp',
-		'framePointer'
-	],
 	#category : #'Telemetry-VirtualMachine'
 }
 
@@ -14,7 +10,12 @@ VirtualMachineTelemetrySignal >> accept: aVisitor [
 
 { #category : #accessing }
 VirtualMachineTelemetrySignal >> framePointer [
-	^ framePointer
+	^ nil
+]
+
+{ #category : #testing }
+VirtualMachineTelemetrySignal >> isDebugSignal [
+	^ false
 ]
 
 { #category : #testing }
@@ -23,7 +24,6 @@ VirtualMachineTelemetrySignal >> isReturnSignal [
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetrySignal >> timestamp [
-	"Amount of nanoseconds since the creation of telemetry"
-	^ timestamp
+VirtualMachineTelemetrySignal >> sourceIdName [
+	^ ''
 ]

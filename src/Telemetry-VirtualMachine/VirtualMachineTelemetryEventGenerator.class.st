@@ -10,6 +10,16 @@ Class {
 }
 
 { #category : #accessing }
+VirtualMachineTelemetryEventGenerator >> attemptToGoAllTheWayUp: aSignal [
+	eventStack
+		ifNotEmpty: [ :aStack | 
+			(eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ])
+				ifTrue: [
+					self visitReturnBackToFrame: aSignal.
+					self attemptToGoAllTheWayUp: aSignal ] ]
+]
+
+{ #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> generateFrom: theSignals [
 	theSignals withIndexDo: [ :each :i | i = 53 ifTrue: [ "self halt" ]. each accept: self ].
 	rootEvents size >= 1
@@ -24,14 +34,6 @@ VirtualMachineTelemetryEventGenerator >> initialize [
 	eventStack := Stack new.
 	signalStack := Stack new.
 	rootEvents := OrderedCollection new
-]
-
-{ #category : #accessing }
-VirtualMachineTelemetryEventGenerator >> isEvent: anEvent targetForReturnTo: aSignal comparingByFramePointer: shouldCompareByFramePointer [
-	shouldCompareByFramePointer
-		ifTrue: [ ^ anEvent framePointer = aSignal framePointer ].
-
-	^ true
 ]
 
 { #category : #accessing }
@@ -96,9 +98,7 @@ VirtualMachineTelemetryEventGenerator >> visitReturnBackToFrame: aSignal [
 
 { #category : #accessing }
 VirtualMachineTelemetryEventGenerator >> visitSend: aSignal [
-	eventStack ifNotEmpty: [ :aStack |
-		(eventStack anySatisfy: [ :each | each framePointer = aSignal framePointer ])
-			ifTrue: [ self visitReturnBackToFrame: aSignal ] ].
-			
+	self attemptToGoAllTheWayUp: aSignal.
+
 	self pushNewEventFor: aSignal
 ]

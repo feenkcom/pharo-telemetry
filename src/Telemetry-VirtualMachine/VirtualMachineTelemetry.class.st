@@ -34,7 +34,7 @@ VirtualMachineTelemetry class >> spyOn: aBlock [
 	<return: #VirtualMachineTelemetry>
 	| aTelemetry |
 
-	self start.
+	self primStartTelemetry.
 	aBlock ensure: [ aTelemetry := self stop ].
 	^ aTelemetry
 ]
@@ -57,7 +57,7 @@ VirtualMachineTelemetry class >> stop [
 
 { #category : #accessing }
 VirtualMachineTelemetry >> at: anIndex [
-	<return: #VirtualMachineTelemetrySignal>
+	<return: #VirtualMachineTelemetryFrameSignal>
 
 	^ self
 		primitiveReify: signalTypes
@@ -74,13 +74,24 @@ VirtualMachineTelemetry >> finalize [
 ]
 
 { #category : #accessing }
+VirtualMachineTelemetry >> gtAllSignalsFor: aView [
+	<gtView>
+	
+	^ aView forward
+		title: 'All Signals';
+		priority: 3;
+		object: [ self signals];
+		view: #gtItemsFor:
+]
+
+{ #category : #accessing }
 VirtualMachineTelemetry >> gtSignalsFor: aView [
 	<gtView>
 	
 	^ aView forward
 		title: 'Signals';
 		priority: 2;
-		object: [ self signals];
+		object: [ self signals select: [ :each | each isDebugSignal not ] ];
 		view: #gtItemsFor:
 ]
 
@@ -132,7 +143,8 @@ VirtualMachineTelemetry >> telemetrySignalTypes [
 	^ {
 		VirtualMachineTelemetrySendSignal.
 		VirtualMachineTelemetryReturnSignal.
-		VirtualMachineTelemetryMethodSwitchSignal.
-		VirtualMachineTelemetryContextSwitchSignal
+		VirtualMachineTelemetryPrimitiveActivationSignal.
+		VirtualMachineTelemetryContextSwitchSignal.
+		VirtualMachineTelemetryDebugSignal
 	}
 ]

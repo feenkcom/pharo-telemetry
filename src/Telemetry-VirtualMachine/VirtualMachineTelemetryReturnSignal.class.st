@@ -1,8 +1,7 @@
 Class {
 	#name : #VirtualMachineTelemetryReturnSignal,
-	#superclass : #VirtualMachineTelemetrySignal,
+	#superclass : #VirtualMachineTelemetryFrameSignal,
 	#instVars : [
-		'method',
 		'sourceId',
 		'executionLocation'
 	],
@@ -28,20 +27,19 @@ VirtualMachineTelemetryReturnSignal >> executionLocationName [
 	^ ''
 ]
 
-{ #category : #accessing }
-VirtualMachineTelemetryReturnSignal >> gtSourceCodeFor: aView [
-	<gtView>
-	
-	^ aView forward
-		title: 'Source';
-		priority: 2;
-		object: [ method ];
-		view: #gtSourceCodeFor:
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isArrowReturnTrampolineInInterpreter [
+	^ self isInterpreterCode and: [ sourceId = 21 ]
 ]
 
-{ #category : #accessing }
-VirtualMachineTelemetryReturnSignal >> isFrom [
-	^ false
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isBaseFrame [
+	^ sourceId = 6
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isCommonCallerReturn [
+	^ sourceId = 10
 ]
 
 { #category : #testing }
@@ -65,40 +63,45 @@ VirtualMachineTelemetryReturnSignal >> isMachineToInterpreterCode [
 ]
 
 { #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isMaybeReturnToMachineCodeFrame [
+	^ sourceId = 4
+]
+
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isPostContextSwitch [
+	^ sourceId = 7 or: [ sourceId = 8 ]
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetryReturnSignal >> isPrimReturn [
+	^ sourceId = 25
+]
+
+{ #category : #testing }
 VirtualMachineTelemetryReturnSignal >> isReturnSignal [
 	^ true
 ]
 
-{ #category : #accessing }
-VirtualMachineTelemetryReturnSignal >> isTo [
-	^ self isFrom not
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isReturnToExecutiveInInterpreter [
+	^ self isInterpreterCode and: [ sourceId = 31 ]
 ]
 
-{ #category : #accessing }
-VirtualMachineTelemetryReturnSignal >> method [
-	^ method
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isReturnToInterpreter [
+	^ sourceId = 1
 ]
 
-{ #category : #accessing }
-VirtualMachineTelemetryReturnSignal >> methodClass [
-	^ method methodClass
+{ #category : #testing }
+VirtualMachineTelemetryReturnSignal >> isReturnToMachineCodeFrame [
+	^ sourceId = 3
 ]
 
 { #category : #accessing }
 VirtualMachineTelemetryReturnSignal >> printOn: aStream [ 
 	"Overrides method inherited from the byte arrayed collection."
 	
-	aStream
-		nextPutAll: 'Return';
-		space;
-		nextPutAll: 'to';
-		space;
-		print: self method
-]
-
-{ #category : #accessing }
-VirtualMachineTelemetryReturnSignal >> selector [
-	^ method selector
+	aStream nextPutAll: 'Return'
 ]
 
 { #category : #testing }
@@ -118,6 +121,17 @@ VirtualMachineTelemetryReturnSignal >> sourceIdName [
 	ReturnToExecutivePostContextWithSwitchSignal := 7.
 	ReturnToExecutivePostContextWithoutSwitchSignal := 8.
 	NonLocalReturnSignal := 9.
+	CommonCallerReturnSignal := 10.
+	SlowPrimitiveReturnSignal := 11.
+	
+	ArrowReturnTrampolineSignal := 21.
+	BlockReturnTrampolineSignal := 22.
+	EnilopmartReturnTrampolineSignal := 23.
+	QuickPrimitiveReturnTrampolineSignal := 24.
+	PrimReturnTrampolineSignal := 25.
+	
+	ReturnToExecutiveInInterpreterSignal := 31.
+	ReturnToExecutiveInMachineCodeSignal := 32.
 	"
 	sourceId = 1
 		ifTrue: [ ^ 'ReturnToInterpreterSignal' ].
@@ -145,6 +159,33 @@ VirtualMachineTelemetryReturnSignal >> sourceIdName [
 	
 	sourceId = 9
 		ifTrue: [ ^ 'NonLocalReturnSignal' ].
+		
+	sourceId = 10
+		ifTrue: [ ^ 'CommonCallerReturnSignal' ].
+		
+	sourceId = 11
+		ifTrue: [ ^ 'SlowPrimitiveReturnSignal' ].
+		
+	sourceId = 21
+		ifTrue: [ ^ 'ArrowReturnTrampolineSignal' ].
+		
+	sourceId = 22
+		ifTrue: [ ^ 'BlockReturnTrampolineSignal' ].
+	
+	sourceId = 23
+		ifTrue: [ ^ 'EnilopmartReturnTrampolineSignal' ].
+		
+	sourceId = 24
+		ifTrue: [ ^ 'QuickPrimitiveReturnTrampolineSignal' ].
+
+	sourceId = 25
+		ifTrue: [ ^ 'PrimReturnTrampolineSignal' ].
+		
+	sourceId = 31
+		ifTrue: [ ^ 'ReturnToExecutiveInInterpreterSignal' ].
+
+	sourceId = 32
+		ifTrue: [ ^ 'ReturnToExecutiveInMachineCodeSignal' ].
 
 	^ 'Unknown: ',sourceId asString
 ]
