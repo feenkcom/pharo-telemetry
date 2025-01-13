@@ -1,29 +1,21 @@
 Class {
 	#name : #VirtualMachineTelemetrySignal,
 	#superclass : #Object,
+	#instVars : [
+		'seconds',
+		'nanos'
+	],
 	#category : #'Telemetry-VirtualMachine'
 }
 
 { #category : #accessing }
-VirtualMachineTelemetrySignal >> accept: aVisitor [
+VirtualMachineTelemetrySignal >> statusText [
+	^ self printString
 ]
 
 { #category : #accessing }
-VirtualMachineTelemetrySignal >> framePointer [
-	^ nil
-]
-
-{ #category : #testing }
-VirtualMachineTelemetrySignal >> isDebugSignal [
-	^ false
-]
-
-{ #category : #testing }
-VirtualMachineTelemetrySignal >> isReturnSignal [
-	^ false
-]
-
-{ #category : #accessing }
-VirtualMachineTelemetrySignal >> sourceIdName [
-	^ ''
+VirtualMachineTelemetrySignal >> timestamp [
+	^ (DateAndTime fromUnixTime: seconds)
+		setNanoSeconds: nanos;
+		yourself
 ]
