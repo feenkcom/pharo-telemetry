@@ -7,6 +7,11 @@ Class {
 	#category : #'Telemetry-VirtualMachine'
 }
 
+{ #category : #'as yet unclassified' }
+VirtualMachineProcessSwitchTelemetrySignal >> isAlive: aBoolean [
+	alive := aBoolean
+]
+
 { #category : #testing }
 VirtualMachineProcessSwitchTelemetrySignal >> isPaused [
 	^ alive not

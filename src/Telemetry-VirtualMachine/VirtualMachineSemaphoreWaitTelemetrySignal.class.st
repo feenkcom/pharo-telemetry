@@ -14,6 +14,11 @@ VirtualMachineSemaphoreWaitTelemetrySignal >> isLocked [
 ]
 
 { #category : #accessing }
+VirtualMachineSemaphoreWaitTelemetrySignal >> semaphore [
+	^ semaphore
+]
+
+{ #category : #accessing }
 VirtualMachineSemaphoreWaitTelemetrySignal >> statusText [
 	^ self isLocked
 		ifTrue: [ 'Waiting on a locked semaphore' asRopedText foreground: BrGlamorousColors failureBorderColor ]
