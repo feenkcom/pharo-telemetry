@@ -19,3 +19,9 @@ VirtualMachineTelemetrySignal >> timestamp [
 		setNanoSeconds: nanos;
 		yourself
 ]
+
+{ #category : #accessing }
+VirtualMachineTelemetrySignal >> timestamp: aDateAndTime [
+	seconds := aDateAndTime asUnixTime.
+	nanos := aDateAndTime nanoSecond
+]
