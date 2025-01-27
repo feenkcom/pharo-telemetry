@@ -23,7 +23,9 @@ VirtualMachineAllProcessesSwitchTelemetry class >> spyFor: aDuration [
 	[ [
 		aTelemetry start.
 		aDuration wait ]
-			ensure: [ aTelemetry stop ] ] forkAt: Processor highestPriority.
+			ensure: [
+				aTelemetry stop.
+				self inform: 'Telemetry Finished' ] ] forkAt: Processor highestPriority.
 
 	^ aTelemetry
 ]
@@ -44,6 +46,23 @@ VirtualMachineAllProcessesSwitchTelemetry class >> spyOn: aBlock [
 ]
 
 { #category : #'as yet unclassified' }
+VirtualMachineAllProcessesSwitchTelemetry >> eventsByProcess [
+	| allEvents |
+	
+	allEvents := ((signalsDictionary associations sorted: [ :a :b | a key priority > b key priority ])
+		collect: [ :each | each key -> (self eventsIn: each value) ]
+		thenSelect: [ :each | each value isNotEmpty ])
+			collect: [ :each |
+				VirtualMachineTelemetryEvents new
+					process: each key;
+					addEvents: each value ].
+
+	^ VirtualMachineTelemetryEventsByProcess new
+		addAll: allEvents;
+		yourself
+]
+
+{ #category : #'as yet unclassified' }
 VirtualMachineAllProcessesSwitchTelemetry >> eventsIn: aCollection [
 	| allEvents |
 	allEvents := (self pauseEventsIn: aCollection), (self resumeEventsIn: aCollection).
@@ -51,98 +70,27 @@ VirtualMachineAllProcessesSwitchTelemetry >> eventsIn: aCollection [
 ]
 
 { #category : #accessing }
-VirtualMachineAllProcessesSwitchTelemetry >> gtPauseEventsFor: aView [
-	"<gtView>"
-	
-	^ aView columnedList
-		title: 'Pauses';
-		priority: 1;
-		items: [ self pauseEvents ];
-		column: 'Index' 
-			text: [ :eachItem :eachIndex | 
-				eachIndex asRopedText foreground: Color gray ]
-			width: 45;
-		column: 'Duration' 
-			text: [ :eachItem | eachItem duration gtPreciseHumanReadableString ];
-		column: 'Reason'
-			text: [ :eachItem | eachItem printHumanReadablePauseReason ];
-		column: 'Timestamp'
-			text: [ :eachItem | eachItem startTime ];
-		actionUpdateButton
-]
-
-{ #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> gtProcessesFor: aView [
 	<gtView>
 	
-	^ aView columnedList
+	^ aView forward
 		title: 'Signals by process';
 		priority: 7;
-		items: [ (signalsDictionary associations sorted: [ :a :b | a key priority > b key priority ]) ];
-		column: 'Index' 
-			text: [ :eachItem :eachIndex | 
-				eachIndex asRopedText foreground: Color gray ]
-			width: 45;
-		column: 'Process' 
-			text: [ :eachItem | eachItem key gtName ]
-			weight: 0.6;
-		column: 'Priority' 
-			text: [ :eachItem | eachItem key priority ]
-			width: 60;
-		column: 'Amount of signals'
-			text: [ :eachItem | eachItem value size ]
-			weight: 0.4;
-		send: [ :eachItem | eachItem value ];
-		actionUpdateButton
-]
-
-{ #category : #accessing }
-VirtualMachineAllProcessesSwitchTelemetry >> gtSignalsFor: aView [
-	"<gtView>"
-	
-	^ aView columnedList
-		title: 'Signals';
-		priority: 2;
-		items: [ self signals ];
-		column: 'Index' 
-			text: [ :eachItem :eachIndex | 
-				eachIndex asRopedText foreground: Color gray ]
-			width: 45;
-		column: 'Status' 
-			text: [ :eachItem | eachItem statusText ];
-		column: 'Timestamp'
-			text: [ :eachItem | eachItem timestamp ];
-		actionUpdateButton
+		object: [ self eventsByProcess ];
+		view: #gtProcessesFor:
 ]
 
 { #category : #'as yet unclassified' }
 VirtualMachineAllProcessesSwitchTelemetry >> gtTimelineFor: aView [
 	<gtView>
-	^ aView explicit
+	^ aView forward
 		title: 'Timeline';
 		priority: 5;
-		stencil: [
-			GtMonitorFutureWorkerHorizontalChartStencil new
-				leftPadding: 20;
-				labelWidth: 250;
-				labelFontSize: 12;
-				rowHeight: 20;
-				barHeight: 10;
-				withoutGridlines;
-				withoutTickLabels;
-				startTimeComputation: #startTime;
-				endTimeComputation: #endTime;
-				colorComputation: [ :each |
-					each isResumedEvent
-						ifTrue: [ Color blue ]
-						ifFalse: [ each isWaitingOnSemaphore
-							ifTrue: [ Color orange ]
-							ifFalse: [ Color veryVeryLightGray ] ] ];
-				executionGeometryComputation: [ :each | BlRectangleGeometry new ];
-				rowValuesComputation: #signals;
-				rowLabelComputation: [ :each | each process gtName ];
-				executions: self signalsByProcess ];
-		actionUpdateButton
+		object: [ self eventsByProcess ];
+		view: #gtTimelineFor:;
+		actionButtonIcon: BrGlamorousVectorIcons inspect
+			tooltip: 'Inspect events'
+			action: [ :aButton | aButton phlow spawnObject: self eventsByProcess ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -183,7 +131,7 @@ VirtualMachineAllProcessesSwitchTelemetry >> pauseEventsIn: aCollection [
 			ifFalse: [ pauseReason := nil ].
 
 		((eachSignal isKindOf: VirtualMachineSemaphoreWaitTelemetrySignal)
-			and: [ eachSignal isLocked ])
+			and: [ eachSignal isWaiting ])
 				ifTrue: [ pauseReason := eachSignal ] ].
 
 	^ pausedEvents
@@ -231,17 +179,6 @@ VirtualMachineAllProcessesSwitchTelemetry >> resumeEventsIn: aCollection [
 { #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> signals [
 	^ signalsDictionary
-]
-
-{ #category : #'as yet unclassified' }
-VirtualMachineAllProcessesSwitchTelemetry >> signalsByProcess [
-	^ ((signalsDictionary associations sorted: [ :a :b | a key priority > b key priority ])
-		collect: [ :each | each key -> (self eventsIn: each value) ]
-		thenSelect: [ :each | each value isNotEmpty ])
-			collect: [ :each |
-				VirtualMachineTelemetrySignalsByProcess new
-					process: each key;
-					signals: each value ]
 ]
 
 { #category : #accessing }

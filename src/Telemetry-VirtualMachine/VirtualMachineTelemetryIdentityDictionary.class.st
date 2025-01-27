@@ -8,15 +8,20 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+VirtualMachineTelemetryIdentityDictionary >> associationClass [
+	^ Association
+]
+
+{ #category : #'as yet unclassified' }
 VirtualMachineTelemetryIdentityDictionary >> initialize [
 	super initialize.
 	
-	associationClass := Association
+	associationClass := self associationClass
 ]
 
 { #category : #'as yet unclassified' }
 VirtualMachineTelemetryIdentityDictionary >> initialize: n [
 	super initialize: n.
 	
-	associationClass := Association
+	associationClass := self associationClass
 ]

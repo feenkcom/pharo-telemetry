@@ -29,6 +29,12 @@ VirtualMachineTelemetryProcessPausedEvent >> endTime [
 	^ endSignal timestamp
 ]
 
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessPausedEvent >> isLockedOnSemaphore [
+	^ (reasonSignal isKindOf: VirtualMachineSemaphoreWaitTelemetrySignal)
+			and: [ reasonSignal isLocked ]
+]
+
 { #category : #testing }
 VirtualMachineTelemetryProcessPausedEvent >> isPausedEvent [
 	^ true
@@ -37,7 +43,7 @@ VirtualMachineTelemetryProcessPausedEvent >> isPausedEvent [
 { #category : #'as yet unclassified' }
 VirtualMachineTelemetryProcessPausedEvent >> isWaitingOnSemaphore [
 	^ (reasonSignal isKindOf: VirtualMachineSemaphoreWaitTelemetrySignal)
-			and: [ reasonSignal isLocked ]
+			and: [ reasonSignal isWaiting ]
 ]
 
 { #category : #'as yet unclassified' }

@@ -10,6 +10,11 @@ Class {
 
 { #category : #testing }
 VirtualMachineSemaphoreWaitTelemetrySignal >> isLocked [
+	^ isLocked and: [ semaphore isKindOf: AsyncSemaphoreForMutualExclusion ]
+]
+
+{ #category : #testing }
+VirtualMachineSemaphoreWaitTelemetrySignal >> isWaiting [
 	^ isLocked
 ]
 

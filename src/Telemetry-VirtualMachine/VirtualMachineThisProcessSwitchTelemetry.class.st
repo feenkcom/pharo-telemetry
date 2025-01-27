@@ -104,7 +104,7 @@ VirtualMachineThisProcessSwitchTelemetry >> pauseEvents [
 			ifFalse: [ pauseReason := nil ].
 
 		((eachSignal isKindOf: VirtualMachineSemaphoreWaitTelemetrySignal)
-			and: [ eachSignal isLocked ])
+			and: [ eachSignal isWaiting ])
 				ifTrue: [ pauseReason := eachSignal ] ].
 
 	^ pausedEvents
