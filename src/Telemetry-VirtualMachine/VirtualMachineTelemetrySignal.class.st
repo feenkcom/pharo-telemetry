@@ -9,11 +9,6 @@ Class {
 }
 
 { #category : #accessing }
-VirtualMachineTelemetrySignal >> statusText [
-	^ self printString
-]
-
-{ #category : #accessing }
 VirtualMachineTelemetrySignal >> timestamp [
 	^ (DateAndTime fromUnixTime: seconds)
 		setNanoSeconds: nanos;

@@ -26,47 +26,7 @@ VirtualMachineThisProcessSwitchTelemetry class >> spyOn: aBlock [
 	^ aTelemetry
 ]
 
-{ #category : #accessing }
-VirtualMachineThisProcessSwitchTelemetry >> gtPauseEventsFor: aView [
-	<gtView>
-	
-	^ aView columnedList
-		title: 'Pauses';
-		priority: 1;
-		items: [ self pauseEvents ];
-		column: 'Index' 
-			text: [ :eachItem :eachIndex | 
-				eachIndex asRopedText foreground: Color gray ]
-			width: 45;
-		column: 'Duration' 
-			text: [ :eachItem | eachItem duration gtPreciseHumanReadableString ];
-		column: 'Reason'
-			text: [ :eachItem | eachItem printHumanReadablePauseReason ];
-		column: 'Timestamp'
-			text: [ :eachItem | eachItem startTime ];
-		actionUpdateButton
-]
-
-{ #category : #accessing }
-VirtualMachineThisProcessSwitchTelemetry >> gtSignalsFor: aView [
-	<gtView>
-	
-	^ aView columnedList
-		title: 'Signals';
-		priority: 2;
-		items: [ self signals ];
-		column: 'Index' 
-			text: [ :eachItem :eachIndex | 
-				eachIndex asRopedText foreground: Color gray ]
-			width: 45;
-		column: 'Status' 
-			text: [ :eachItem | eachItem statusText ];
-		column: 'Timestamp'
-			text: [ :eachItem | eachItem timestamp ];
-		actionUpdateButton
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 VirtualMachineThisProcessSwitchTelemetry >> initialize [
 	super initialize.
 
@@ -77,7 +37,7 @@ VirtualMachineThisProcessSwitchTelemetry >> initialize [
 	semaphoreWaitSignalClass := VirtualMachineSemaphoreWaitTelemetrySignal
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 VirtualMachineThisProcessSwitchTelemetry >> pauseEvents [
 	| pausedEvents pauseSignal pauseReason |
 	
