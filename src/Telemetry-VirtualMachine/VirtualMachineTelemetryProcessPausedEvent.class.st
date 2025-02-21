@@ -46,17 +46,6 @@ VirtualMachineTelemetryProcessPausedEvent >> isWaitingOnSemaphore [
 			and: [ reasonSignal isWaiting ]
 ]
 
-{ #category : #'as yet unclassified' }
-VirtualMachineTelemetryProcessPausedEvent >> printHumanReadablePauseReason [
-	^ reasonSignal
-		ifNil: [ 'Scheduler' asRopedText foreground: BrGlamorousColors fadedTextColor ]
-		ifNotNil: [ :aSignal |
-			self isWaitingOnSemaphore
-				ifTrue: [ 'Locked semaphore' asRopedText foreground: BrGlamorousColors failureBorderColor ]
-				ifFalse: [ aSignal printString ]
-		]
-]
-
 { #category : #accessing }
 VirtualMachineTelemetryProcessPausedEvent >> reasonSignal [
 	^ reasonSignal

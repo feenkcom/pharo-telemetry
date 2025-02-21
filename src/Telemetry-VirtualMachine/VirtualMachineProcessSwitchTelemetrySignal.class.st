@@ -21,10 +21,3 @@ VirtualMachineProcessSwitchTelemetrySignal >> isPaused [
 VirtualMachineProcessSwitchTelemetrySignal >> isResumed [
 	^ alive
 ]
-
-{ #category : #accessing }
-VirtualMachineProcessSwitchTelemetrySignal >> statusText [
-	^ self isPaused
-		ifTrue: [ 'Paused' asRopedText foreground: BrGlamorousColors linkWithErrorColor ]
-		ifFalse: [ 'Resumed' asRopedText foreground: BrGlamorousColors successBorderColor ]
-]

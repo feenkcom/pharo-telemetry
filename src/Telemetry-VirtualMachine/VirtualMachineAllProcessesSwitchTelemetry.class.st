@@ -45,7 +45,7 @@ VirtualMachineAllProcessesSwitchTelemetry class >> spyOn: aBlock [
 	^ aTelemetry
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> eventsByProcess [
 	| allEvents |
 	
@@ -62,38 +62,14 @@ VirtualMachineAllProcessesSwitchTelemetry >> eventsByProcess [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> eventsIn: aCollection [
 	| allEvents |
 	allEvents := (self pauseEventsIn: aCollection), (self resumeEventsIn: aCollection).
 	^ allEvents
 ]
 
-{ #category : #accessing }
-VirtualMachineAllProcessesSwitchTelemetry >> gtProcessesFor: aView [
-	<gtView>
-	
-	^ aView forward
-		title: 'Signals by process';
-		priority: 7;
-		object: [ self eventsByProcess ];
-		view: #gtProcessesFor:
-]
-
-{ #category : #'as yet unclassified' }
-VirtualMachineAllProcessesSwitchTelemetry >> gtTimelineFor: aView [
-	<gtView>
-	^ aView forward
-		title: 'Timeline';
-		priority: 5;
-		object: [ self eventsByProcess ];
-		view: #gtTimelineFor:;
-		actionButtonIcon: BrGlamorousVectorIcons inspect
-			tooltip: 'Inspect events'
-			action: [ :aButton | aButton phlow spawnObject: self eventsByProcess ]
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 VirtualMachineAllProcessesSwitchTelemetry >> initialize [
 	super initialize.
 
@@ -104,7 +80,7 @@ VirtualMachineAllProcessesSwitchTelemetry >> initialize [
 	orderedCollectionClass := OrderedCollection
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> pauseEventsIn: aCollection [
 	| pausedEvents pauseSignal pauseReason |
 	
@@ -151,7 +127,7 @@ VirtualMachineAllProcessesSwitchTelemetry >> primStopTelemetry: anId [
 	^ self primitiveFailed
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> resumeEventsIn: aCollection [
 	| resumeEvents resumeSignal |
 	
