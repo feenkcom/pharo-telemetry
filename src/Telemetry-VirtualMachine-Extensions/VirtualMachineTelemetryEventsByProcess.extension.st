@@ -46,7 +46,7 @@ VirtualMachineTelemetryEventsByProcess >> gtTimelineFor: aView [
 		title: 'Timeline';
 		priority: 5;
 		stencil: [
-			GtMonitorFutureWorkerHorizontalChartStencil new
+			GtPlotterHorizontalCompositeBarChartStencil new
 				leftPadding: 20;
 				labelWidth: 250;
 				labelFontSize: 12;

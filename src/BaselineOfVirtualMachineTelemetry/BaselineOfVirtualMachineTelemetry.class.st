@@ -4,10 +4,10 @@ Class {
 	#category : #BaselineOfVirtualMachineTelemetry
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 BaselineOfVirtualMachineTelemetry class >> gtDependencyAnalysisPreloadedBaselines [
-	^ super gtDependencyAnalysisPreloadedBaselines
-		, {BaselineOfBrick}
+	^ super gtDependencyAnalysisPreloadedBaselines,
+		{ BaselineOfBrick . BaselineOfGToolkitVisualizer }
 ]
 
 { #category : #accessing }
@@ -17,11 +17,9 @@ BaselineOfVirtualMachineTelemetry >> baseline: spec [
 	spec for: #'common' do: [
 		spec baseline: 'Telemetry' with: [
 			spec repository: 'github://feenkcom/pharo-telemetry:main/src' ].
-		spec baseline: 'FuturesTelemetry' with: [
-			spec repository: 'github://feenkcom/pharo-futures:main/src' ].
 		spec baseline: 'GToolkitFileUtility' with: [
 			spec repository: 'github://feenkcom/gtoolkit-utility:main/src' ].
 		spec 
 			package: #'Telemetry-VirtualMachine' with: [ spec requires: #('Telemetry' 'GToolkitFileUtility'). ].
-		spec package: #'Telemetry-VirtualMachine-Extensions' with: [ spec requires: #('Telemetry-VirtualMachine' 'FuturesTelemetry'). ]. ].
+		spec package: #'Telemetry-VirtualMachine-Extensions' with: [ spec requires: #('Telemetry-VirtualMachine'). ]. ].
 ]
