@@ -14,7 +14,7 @@ Class {
 
 { #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry class >> spyFor: aDuration [
-	<return: #VirtualMachineTelemetry>
+	<return: #VirtualMachineAllProcessesSwitchTelemetry>
 	| aTelemetry |
 
 	aTelemetry := self basicNewPinned
@@ -32,7 +32,7 @@ VirtualMachineAllProcessesSwitchTelemetry class >> spyFor: aDuration [
 
 { #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry class >> spyOn: aBlock [
-	<return: #VirtualMachineTelemetry>
+	<return: #VirtualMachineAllProcessesSwitchTelemetry>
 	| aTelemetry |
 
 	aTelemetry := self basicNewPinned

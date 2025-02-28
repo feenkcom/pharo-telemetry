@@ -13,7 +13,7 @@ Class {
 
 { #category : #accessing }
 VirtualMachineThisProcessSwitchTelemetry class >> spyOn: aBlock [
-	<return: #VirtualMachineTelemetry>
+	<return: #VirtualMachineThisProcessSwitchTelemetry>
 	| aTelemetry |
 
 	aTelemetry := self basicNewPinned
