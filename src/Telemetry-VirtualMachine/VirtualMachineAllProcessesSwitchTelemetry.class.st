@@ -7,6 +7,8 @@ Class {
 		'signalsDictionary',
 		'contextSwitchSignalClass',
 		'semaphoreWaitSignalClass',
+		'objectSignalClass',
+		'contextSignalClass',
 		'orderedCollectionClass'
 	],
 	#category : #'Telemetry-VirtualMachine'
