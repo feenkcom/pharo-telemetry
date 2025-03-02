@@ -7,6 +7,8 @@ Class {
 		'signalsDictionary',
 		'contextSwitchSignalClass',
 		'semaphoreWaitSignalClass',
+		'objectSignalClass',
+		'contextSignalClass',
 		'orderedCollectionClass'
 	],
 	#category : #'Telemetry-VirtualMachine'
@@ -46,6 +48,32 @@ VirtualMachineAllProcessesSwitchTelemetry class >> spyOn: aBlock [
 ]
 
 { #category : #accessing }
+VirtualMachineAllProcessesSwitchTelemetry >> computationEventsIn: aCollection [
+	| objectSignals customEvents |
+	
+	objectSignals := Stack new.
+	customEvents := OrderedCollection new.
+	
+	aCollection do: [ :eachSignal |
+		(eachSignal isKindOf: VirtualMachineComputationTelemetrySignal)
+			ifTrue: [
+				eachSignal isStart
+					ifTrue: [ objectSignals push: eachSignal ].
+					
+				(eachSignal isEnd and: [ objectSignals isNotEmpty ])
+					ifTrue: [
+						| aStartSignal |
+						
+						aStartSignal := objectSignals pop.
+						customEvents add: (VirtualMachineTelemetryProcessComputationEvent new
+							startSignal: aStartSignal;
+							endSignal: eachSignal;
+							yourself) ] ] ].
+
+	^ customEvents
+]
+
+{ #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> eventsByProcess [
 	| allEvents |
 	
@@ -65,7 +93,7 @@ VirtualMachineAllProcessesSwitchTelemetry >> eventsByProcess [
 { #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> eventsIn: aCollection [
 	| allEvents |
-	allEvents := (self pauseEventsIn: aCollection), (self resumeEventsIn: aCollection).
+	allEvents := (self pauseEventsIn: aCollection), (self resumeEventsIn: aCollection), (self computationEventsIn: aCollection).
 	^ allEvents
 ]
 
@@ -77,6 +105,8 @@ VirtualMachineAllProcessesSwitchTelemetry >> initialize [
 	signalsDictionary := VirtualMachineTelemetryIdentityDictionary new.
 	contextSwitchSignalClass := VirtualMachineProcessSwitchTelemetrySignal.
 	semaphoreWaitSignalClass := VirtualMachineSemaphoreWaitTelemetrySignal.
+	objectSignalClass := VirtualMachineComputationTelemetrySignal.
+	contextSignalClass := VirtualMachineContextStackSignal.
 	orderedCollectionClass := OrderedCollection
 ]
 
@@ -129,13 +159,16 @@ VirtualMachineAllProcessesSwitchTelemetry >> primStopTelemetry: anId [
 
 { #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> resumeEventsIn: aCollection [
-	| resumeEvents resumeSignal |
+	| resumeEvents resumeSignal customSignals |
 	
 	resumeEvents := OrderedCollection new.
-	
 	resumeSignal := nil.
+	customSignals := OrderedCollection new.
 	
 	aCollection do: [ :eachSignal |
+		(eachSignal isKindOf: VirtualMachineContextStackSignal)
+			ifTrue: [ customSignals add: eachSignal ].
+	
 		(eachSignal isKindOf: VirtualMachineProcessSwitchTelemetrySignal)
 			ifTrue: [
 				eachSignal isResumed
@@ -145,7 +178,11 @@ VirtualMachineAllProcessesSwitchTelemetry >> resumeEventsIn: aCollection [
 					ifTrue: [
 						resumeEvents add: (VirtualMachineTelemetryProcessResumedEvent new
 							startSignal: resumeSignal;
-							endSignal: eachSignal).
+							endSignal: eachSignal;
+							events: customSignals;
+							yourself).
+						
+						customSignals := OrderedCollection new.
 						
 						resumeSignal := nil ] ] ].
 

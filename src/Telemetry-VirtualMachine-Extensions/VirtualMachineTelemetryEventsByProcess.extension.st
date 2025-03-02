@@ -5,7 +5,7 @@ VirtualMachineTelemetryEventsByProcess >> gtProcessesFor: aView [
 	<gtView>
 	
 	^ aView columnedList
-		title: 'Signals by process';
+		title: 'Events by process';
 		priority: 7;
 		items: [ self ];
 		column: 'Index' 
@@ -18,7 +18,7 @@ VirtualMachineTelemetryEventsByProcess >> gtProcessesFor: aView [
 		column: 'Priority' 
 			text: [ :eachItem | eachItem process priority ]
 			width: 60;
-		column: 'Amount of signals'
+		column: 'Amount of events'
 			text: [ :eachItem | eachItem items size ]
 			weight: 0.4;
 		send: [ :eachItem | eachItem ];
@@ -59,9 +59,13 @@ VirtualMachineTelemetryEventsByProcess >> gtTimelineFor: aView [
 				colorComputation: [ :each |
 					each isResumedEvent
 						ifTrue: [ Color blue ]
-						ifFalse: [ each isLockedOnSemaphore
-							ifTrue: [ Color red ]
-							ifFalse: [ Color transparent ] ] ];
+						ifFalse: [
+							each isComputationEvent
+								ifTrue: [ Color veryLightGray ]
+								ifFalse: [
+									each isLockedOnSemaphore
+										ifTrue: [ Color red ]
+										ifFalse: [ Color transparent ] ] ] ];
 				executionGeometryComputation: [ :each | BlRectangleGeometry new ];
 				rowValuesComputation: #lockOrWorkEvents;
 				rowLabelComputation: [ :each | each process gtShortName ];

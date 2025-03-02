@@ -24,6 +24,11 @@ VirtualMachineTelemetryEvents >> addEvents: aCollectionOfSignals [
 ]
 
 { #category : #'as yet unclassified' }
+VirtualMachineTelemetryEvents >> allComputations [
+	^ self items select: [ :each | each isComputationEvent ]
+]
+
+{ #category : #'as yet unclassified' }
 VirtualMachineTelemetryEvents >> allPauses [
 	^ self items select: [ :each | each isPausedEvent ]
 ]
@@ -31,6 +36,11 @@ VirtualMachineTelemetryEvents >> allPauses [
 { #category : #'as yet unclassified' }
 VirtualMachineTelemetryEvents >> allSemaphoreWaits [
 	^ self items select: [ :each | each isPausedEvent and: [ each isWaitingOnSemaphore ] ]
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryEvents >> allWorkEvents [
+	^ self items select: [ :each | each isResumedEvent ]
 ]
 
 { #category : #accessing }
@@ -45,7 +55,11 @@ VirtualMachineTelemetryEvents >> endTime [
 
 { #category : #'as yet unclassified' }
 VirtualMachineTelemetryEvents >> lockOrWorkEvents [
-	^ self select: [ :eachEvent | eachEvent isResumedEvent or: [ eachEvent isPausedEvent and: [ eachEvent isLockedOnSemaphore ] ] ]
+	^ self
+		select: [ :eachEvent | 
+			eachEvent isResumedEvent
+				or: [ eachEvent isComputationEvent
+						or: [ eachEvent isPausedEvent and: [ eachEvent isLockedOnSemaphore ] ] ] ]
 ]
 
 { #category : #'as yet unclassified' }

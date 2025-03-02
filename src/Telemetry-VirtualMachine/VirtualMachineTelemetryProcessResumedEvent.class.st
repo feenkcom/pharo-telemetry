@@ -3,7 +3,8 @@ Class {
 	#superclass : #VirtualMachineTelemetryEvent,
 	#instVars : [
 		'startSignal',
-		'endSignal'
+		'endSignal',
+		'events'
 	],
 	#category : #'Telemetry-VirtualMachine'
 }
@@ -26,6 +27,41 @@ VirtualMachineTelemetryProcessResumedEvent >> endSignal: anObject [
 { #category : #accessing }
 VirtualMachineTelemetryProcessResumedEvent >> endTime [
 	^ endSignal timestamp
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetryProcessResumedEvent >> events [
+	^ events
+]
+
+{ #category : #accessing }
+VirtualMachineTelemetryProcessResumedEvent >> events: anObject [
+	events := anObject
+]
+
+{ #category : #views }
+VirtualMachineTelemetryProcessResumedEvent >> gtEventsFor: aView [
+	<gtView>
+	events ifNil: [ ^ aView empty ].
+	^ aView columnedList
+		title: 'Signals';
+		priority: 7;
+		items: [ events ];
+		column: 'Index'
+			text: [ :each :index | index asRopedText foreground: Color gray ]
+			width: 45;
+		column: 'Value' text: [ :each | each payload gtDisplayString ]
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessResumedEvent >> gtStackFor: aView [
+	<gtView>
+	
+	^ aView forward
+		title: 'Stack';
+		object: [ endSignal ];
+		priority: 5;
+		view: #gtStackFor:
 ]
 
 { #category : #testing }

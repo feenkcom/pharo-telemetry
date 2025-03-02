@@ -29,6 +29,20 @@ VirtualMachineTelemetryProcessPausedEvent >> endTime [
 	^ endSignal timestamp
 ]
 
+{ #category : #views }
+VirtualMachineTelemetryProcessPausedEvent >> gtReasonSignalFor: aView [
+	<gtView>
+	
+	(self isWaitingOnSemaphore or: [ self isLockedOnSemaphore ])
+		ifFalse: [ ^ aView empty ].
+	
+	^ aView forward
+		title: 'Stack';
+		object: [ reasonSignal ];
+		priority: 5;
+		view: #gtStackFor:
+]
+
 { #category : #'as yet unclassified' }
 VirtualMachineTelemetryProcessPausedEvent >> isLockedOnSemaphore [
 	^ (reasonSignal isKindOf: VirtualMachineSemaphoreWaitTelemetrySignal)
