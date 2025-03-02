@@ -5,8 +5,9 @@ VirtualMachineTelemetryProcessPausedEvent >> printHumanReadablePauseReason [
 	^ reasonSignal
 		ifNil: [ 'Scheduler' asRopedText foreground: BrGlamorousColors fadedTextColor ]
 		ifNotNil: [ :aSignal |
-			self isWaitingOnSemaphore
+			aSignal statusText
+			"self isWaitingOnSemaphore
 				ifTrue: [ 'Locked semaphore' asRopedText foreground: BrGlamorousColors failureBorderColor ]
-				ifFalse: [ aSignal printString ]
+				ifFalse: [ aSignal printString ]"
 		]
 ]

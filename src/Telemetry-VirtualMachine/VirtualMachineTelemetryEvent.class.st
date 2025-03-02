@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #testing }
+VirtualMachineTelemetryEvent >> isComputationEvent [
+	^ false
+]
+
+{ #category : #testing }
 VirtualMachineTelemetryEvent >> isPausedEvent [
 	^ false
 ]
