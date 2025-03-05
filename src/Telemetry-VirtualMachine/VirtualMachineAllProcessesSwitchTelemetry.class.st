@@ -49,26 +49,34 @@ VirtualMachineAllProcessesSwitchTelemetry class >> spyOn: aBlock [
 
 { #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> computationEventsIn: aCollection [
-	| objectSignals customEvents |
+	| customEvents eventsStack |
 	
-	objectSignals := Stack new.
 	customEvents := OrderedCollection new.
+	eventsStack := Stack new.
 	
 	aCollection do: [ :eachSignal |
 		(eachSignal isKindOf: VirtualMachineComputationTelemetrySignal)
 			ifTrue: [
 				eachSignal isStart
-					ifTrue: [ objectSignals push: eachSignal ].
-					
-				(eachSignal isEnd and: [ objectSignals isNotEmpty ])
 					ifTrue: [
-						| aStartSignal |
+						eventsStack push: (VirtualMachineTelemetryProcessComputationEvent new
+							startSignal: eachSignal;
+							yourself) ].
+
+				(eachSignal isEnd and: [ eventsStack isNotEmpty ])
+					ifTrue: [
+						| anEvent |
 						
-						aStartSignal := objectSignals pop.
-						customEvents add: (VirtualMachineTelemetryProcessComputationEvent new
-							startSignal: aStartSignal;
-							endSignal: eachSignal;
-							yourself) ] ] ].
+						anEvent := eventsStack pop.
+						anEvent endSignal: eachSignal.
+						
+						eventsStack isNotEmpty
+							ifTrue: [
+								eventsStack top addEvent: anEvent
+							]
+							ifFalse: [ customEvents add: anEvent ].
+						
+						 ] ] ].
 
 	^ customEvents
 ]

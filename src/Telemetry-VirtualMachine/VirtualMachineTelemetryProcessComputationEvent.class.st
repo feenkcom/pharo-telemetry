@@ -3,10 +3,16 @@ Class {
 	#superclass : #VirtualMachineTelemetryEvent,
 	#instVars : [
 		'startSignal',
-		'endSignal'
+		'endSignal',
+		'events'
 	],
 	#category : #'Telemetry-VirtualMachine'
 }
+
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessComputationEvent >> addEvent: aComputationEvent [
+	events add: aComputationEvent
+]
 
 { #category : #accessing }
 VirtualMachineTelemetryProcessComputationEvent >> duration [
@@ -29,6 +35,28 @@ VirtualMachineTelemetryProcessComputationEvent >> endTime [
 ]
 
 { #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessComputationEvent >> events [
+	^ events
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessComputationEvent >> gtDisplayOn: stream [
+	super gtDisplayOn: stream.
+	
+	stream space.
+	stream nextPut: $(.
+	self value gtDisplayOn: stream.
+	stream nextPut: $)
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessComputationEvent >> initialize [
+	super initialize.
+	
+	events := OrderedCollection new: 0
+]
+
+{ #category : #'as yet unclassified' }
 VirtualMachineTelemetryProcessComputationEvent >> isComputationEvent [
 	^ true
 ]
@@ -46,4 +74,9 @@ VirtualMachineTelemetryProcessComputationEvent >> startSignal: anObject [
 { #category : #accessing }
 VirtualMachineTelemetryProcessComputationEvent >> startTime [
 	^ startSignal timestamp
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessComputationEvent >> value [
+	^ endSignal value
 ]

@@ -7,25 +7,42 @@ VirtualMachineTelemetryEvents >> gtComputationsFor: aView [
 	self allComputations
 		ifEmpty: [ ^ aView empty ].
 		
-	^ aView columnedList
+	^ aView columnedTree
 		title: 'Computations';
 		priority: 10;
 		items: [ self allComputations ];
+		children: [ :each | each events ];
 		column: 'Index' 
 			text: [ :eachItem :eachIndex | 
 				eachIndex asRopedText foreground: Color gray ]
 			width: 45;
 		column: 'Timestamp' 
 			text: [ :eachItem | eachItem startTime ];
-		column: 'Duration' 
+		column: 'Value' 
+			text: [ :eachItem | eachItem value ];
+		column: 'CPU Time' 
 			text: [ :eachItem |
-				| durationColor |
+				| cpuTime durationColor |
 				
-				durationColor := eachItem duration <= 1 milliSecond
+				cpuTime := self cpuTimeBetween: eachItem startTime and: eachItem endTime.
+				
+				durationColor := cpuTime <= 1 milliSecond
 					ifTrue:  [ Color gray ]
 					ifFalse: [ Color red ].
 			
-				eachItem duration gtPreciseHumanReadableString asRopedText foreground: durationColor ].
+				cpuTime gtPreciseHumanReadableString asRopedText foreground: durationColor ];
+		column: 'Pause Time' 
+			text: [ :eachItem |
+				| cpuTime durationColor |
+				
+				cpuTime := self pausesBetween: eachItem startTime and: eachItem endTime.
+				
+				durationColor := cpuTime isZero
+					ifTrue:  [ Color blue ]
+					ifFalse: [ Color gray ].
+			
+				cpuTime gtPreciseHumanReadableString asRopedText foreground: durationColor ];
+		actionUpdateButton.
 ]
 
 { #category : #'*Telemetry-VirtualMachine-Extensions' }
