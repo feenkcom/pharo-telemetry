@@ -43,6 +43,11 @@ VirtualMachineTelemetryEvents >> allWorkEvents [
 	^ self items select: [ :each | each isResumedEvent ]
 ]
 
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryEvents >> cpuTimeBetween: aStartDate and: anEndDate [
+	^ (anEndDate - aStartDate) - (self pausesBetween: aStartDate and: anEndDate)
+]
+
 { #category : #accessing }
 VirtualMachineTelemetryEvents >> duration [
 	^ self endTime - self startTime
@@ -60,6 +65,19 @@ VirtualMachineTelemetryEvents >> lockOrWorkEvents [
 			eachEvent isResumedEvent
 				or: [ eachEvent isComputationEvent
 						or: [ eachEvent isPausedEvent and: [ eachEvent isLockedOnSemaphore ] ] ] ]
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineTelemetryEvents >> pausesBetween: aStartDate and: anEndDate [
+	| relatedPauseEvents |
+	
+	relatedPauseEvents := self allPauses select: [ :eachEvent |
+		(eachEvent startTime between: aStartDate and: anEndDate)
+			and: [ (eachEvent endTime between: aStartDate and: anEndDate) ] ].
+	
+	^ relatedPauseEvents
+		inject: 0 seconds
+		into: [ :totalDuration :each | totalDuration + each duration ]
 ]
 
 { #category : #'as yet unclassified' }
