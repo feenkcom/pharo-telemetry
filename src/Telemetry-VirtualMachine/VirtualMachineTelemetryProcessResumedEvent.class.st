@@ -54,13 +54,24 @@ VirtualMachineTelemetryProcessResumedEvent >> gtEventsFor: aView [
 ]
 
 { #category : #'as yet unclassified' }
+VirtualMachineTelemetryProcessResumedEvent >> gtPreviousStackFor: aView [
+	<gtView>
+	
+	^ aView forward
+		title: 'Resumed Stack';
+		object: [ startSignal ];
+		priority: 5;
+		view: #gtStackFor:
+]
+
+{ #category : #'as yet unclassified' }
 VirtualMachineTelemetryProcessResumedEvent >> gtStackFor: aView [
 	<gtView>
 	
 	^ aView forward
-		title: 'Stack';
+		title: 'Paused Stack';
 		object: [ endSignal ];
-		priority: 5;
+		priority: 6;
 		view: #gtStackFor:
 ]
 

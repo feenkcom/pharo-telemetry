@@ -81,6 +81,29 @@ VirtualMachineAllProcessesSwitchTelemetry >> computationEventsIn: aCollection [
 	^ customEvents
 ]
 
+{ #category : #'as yet unclassified' }
+VirtualMachineAllProcessesSwitchTelemetry >> copyBetween: aStartDate and: anEndDate [
+	| aCopy newSignals|
+
+	aCopy := self copy.
+	newSignals := aCopy signals.
+	newSignals removeAll.
+	self signals
+		keysAndValuesDo: [ :eachProcess :eachSignals | 
+			| filteredSignals |
+			
+			filteredSignals := (eachSignals
+				select: [ :each | each timestamp between: aStartDate and: anEndDate ]).
+
+			filteredSignals
+				ifNotEmpty: [
+					newSignals
+						at: eachProcess
+						put: filteredSignals ] ].
+
+	^ aCopy
+]
+
 { #category : #accessing }
 VirtualMachineAllProcessesSwitchTelemetry >> eventsByProcess [
 	| allEvents |
@@ -149,6 +172,11 @@ VirtualMachineAllProcessesSwitchTelemetry >> pauseEventsIn: aCollection [
 				ifTrue: [ pauseReason := eachSignal ] ].
 
 	^ pausedEvents
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineAllProcessesSwitchTelemetry >> postCopy [
+	signalsDictionary := signalsDictionary copy 
 ]
 
 { #category : #'private - primitives' }
