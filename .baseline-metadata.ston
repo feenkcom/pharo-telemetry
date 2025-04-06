@@ -1,6 +1,6 @@
 {
 	"repositories" : {
 		"github://feenkcom/gtoolkit-utility/src" : "v0.8.362",
-		"github://feenkcom/pharo-beacon/repository" : "81761d016958d6f20497371ff2564b966b0dc272"
+		"github://feenkcom/pharo-beacon/repository" : "8e3895276641bea04783be0c7cd7b5e21391ef9c"
 	}
 }
