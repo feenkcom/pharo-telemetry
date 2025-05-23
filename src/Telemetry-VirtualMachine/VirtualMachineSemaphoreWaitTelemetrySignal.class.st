@@ -35,6 +35,9 @@ VirtualMachineSemaphoreWaitTelemetrySignal >> isLocked [
 		
 	self isLockedOnMonitor
 		ifTrue: [ ^ true ].
+		
+	self isLockedOnSocket
+		ifTrue: [ ^ true ].
 
 	^ false
 ]
@@ -46,6 +49,15 @@ VirtualMachineSemaphoreWaitTelemetrySignal >> isLockedOnMonitor [
 	^ stack anySatisfy: [ :eachMethod |
 		eachMethod isNotNil and: [
 			eachMethod selector = #enter and: [ eachMethod origin = Monitor ] ] ]
+]
+
+{ #category : #'as yet unclassified' }
+VirtualMachineSemaphoreWaitTelemetrySignal >> isLockedOnSocket [
+	stack ifNil: [ ^ false ].
+	
+	^ stack anySatisfy: [ :eachMethod |
+		eachMethod isNotNil and: [
+			eachMethod selector = #waitForConnectionFor:ifTimedOut: and: [ eachMethod origin = Socket ] ] ]
 ]
 
 { #category : #testing }
