@@ -17,7 +17,10 @@ ManifestTelemetry class >> mustOnlyDependOn [
 		'Collections-Unordered'.
 		'Kernel'.
 		'Tool-Profilers'.
-	}
+	}, (self  
+		forPharo12: [{
+			'System-Time' .}] 
+		forPharo11AndPharo10: [{}])
 ]
 
 { #category : #testing }
