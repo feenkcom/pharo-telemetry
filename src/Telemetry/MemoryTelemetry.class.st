@@ -6,7 +6,8 @@ Class {
 	#instVars : [
 		'recordings',
 		'pingsStack',
-		'data'
+		'data',
+		'tally'
 	],
 	#category : #'Telemetry-Telemetries'
 }
