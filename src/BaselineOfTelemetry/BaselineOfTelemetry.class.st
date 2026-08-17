@@ -10,7 +10,7 @@ BaselineOfTelemetry >> baseline: spec [
 
 	spec for: #'common' do: [
 		spec baseline: 'BeaconCore' with: [
-			spec repository: 'github://feenkcom/pharo-beacon/repository' ].
+			spec repository: 'github://feenkcom/pharo-beacon:main/src' ].
 		spec 
 			package: #'Telemetry' with: [ spec requires: #('BeaconCore'). ]. ].
 ]
