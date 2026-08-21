@@ -29,5 +29,7 @@ VirtualMachineTelemetryEventsByProcess >> mergedByParentProcess [
 			]
 	].
 	
-	^ self class new addAll: byProcessDictionary values
+	^ self class new
+		addAll: byProcessDictionary values;
+		yourself
 ]
