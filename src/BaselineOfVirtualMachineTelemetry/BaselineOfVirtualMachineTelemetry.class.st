@@ -16,10 +16,10 @@ BaselineOfVirtualMachineTelemetry >> baseline: spec [
 	spec for: #'common' do: [
 		spec
 			baseline: 'Telemetry' with: [
-				spec repository: 'github://feenkcom/pharo-telemetry:v0.7.61/src' ].
+				spec repository: 'github://feenkcom/pharo-telemetry:v0.7.62/src' ].
 		spec
 			baseline: 'GToolkitFileUtility' with: [
-				spec repository: 'github://feenkcom/gtoolkit-utility:v0.9.54/src' ].
+				spec repository: 'github://feenkcom/gtoolkit-utility:v0.9.55/src' ].
 
 		spec package: 'Telemetry-VirtualMachine' with: [
 			spec requires: #(#Telemetry #GToolkitFileUtility) ].
